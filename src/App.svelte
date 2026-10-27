@@ -1,5 +1,5 @@
 <script>
-    import { decodePayload, buildShareUrl } from './lib/encode.js';
+    import { decodePayload, encodePayload, buildShareUrl } from './lib/encode.js';
     import { buildCard } from './lib/card.js';
     import Builder from './components/Builder.svelte';
     import KeytagCard from './components/KeytagCard.svelte';
@@ -25,10 +25,21 @@
     function openDisplay() {
         window.open(buildShareUrl({ ...payload, v: 'display' }), '_blank', 'noopener');
     }
+
+    // Leaving full-screen returns to this same keytag's card view, not the
+    // builder — dropping the `v` flag keeps the card and its message intact.
+    function exitDisplay() {
+        if (!payload) {
+            goBuilder();
+            return;
+        }
+        const { v, ...card } = payload;
+        window.location.hash = encodePayload(card);
+    }
 </script>
 
 {#if mode === 'display' && card}
-    <DisplayView {card} onexit={goBuilder} />
+    <DisplayView {card} onexit={exitDisplay} />
 {:else if mode === 'card' && card}
     <main class="card-page">
         <KeytagCard {card} intro={true} />

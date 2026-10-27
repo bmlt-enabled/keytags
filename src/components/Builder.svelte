@@ -104,7 +104,7 @@
 
         <label class="field">
             <span>Personal message <em>(optional)</em></span>
-            <textarea bind:value={msg} maxlength="180" rows="2" placeholder="Proud of you. One day at a time."></textarea>
+            <textarea bind:value={msg} maxlength="180" rows="2" placeholder="Just for Today"></textarea>
         </label>
 
         <label class="field">
