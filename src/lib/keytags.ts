@@ -6,19 +6,15 @@
  * `nacc2/src/nacc.js` `createTagsArray`, returning structured data instead of
  * building DOM.
  */
+import type { DateSpanResult, Tag } from './types';
 
 /** Midnight at the start of the day the given date falls in, in local time. */
-function startOfDay(date) {
+function startOfDay(date: Date): Date {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
-/**
- * @param {Date} fromDate
- * @param {Date} [now]
- * @returns {{ totalDays: number, years: number, months: number, days: number }}
- */
-export function dateSpan(fromDate, now = new Date()) {
-    const diff = { totalDays: 0, years: 0, months: 0, days: 0 };
+export function dateSpan(fromDate: Date, now: Date = new Date()): DateSpanResult {
+    const diff: DateSpanResult = { totalDays: 0, years: 0, months: 0, days: 0 };
 
     if (now <= fromDate) return diff;
 
@@ -51,19 +47,19 @@ export function dateSpan(fromDate, now = new Date()) {
     return diff;
 }
 
-/**
- * Parse a YYYY-MM-DD string into a local Date (no timezone surprises).
- * @param {string} iso
- * @returns {Date|null}
- */
-export function parseCleanDate(iso) {
-    if (typeof iso !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return null;
-    const [y, m, d] = iso.split('-').map((n) => parseInt(n, 10));
-    const date = new Date(y, m - 1, d);
+/** Parse a YYYY-MM-DD string into a local Date (no timezone surprises). */
+export function parseCleanDate(iso: unknown): Date | null {
+    if (typeof iso !== 'string') return null;
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+    if (!match) return null;
+    const y = Number(match[1]);
+    const mo = Number(match[2]);
+    const d = Number(match[3]);
+    const date = new Date(y, mo - 1, d);
     if (Number.isNaN(date.getTime())) return null;
     // Reject impossible dates the Date constructor silently rolls over
     // (e.g. 2025-02-31 → Mar 3; 2025-13-01 → Jan 1 2026).
-    if (date.getFullYear() !== y || date.getMonth() !== m - 1 || date.getDate() !== d) {
+    if (date.getFullYear() !== y || date.getMonth() !== mo - 1 || date.getDate() !== d) {
         return null;
     }
     return date;
@@ -75,14 +71,10 @@ export function parseCleanDate(iso) {
  * Mirrors `createTagsArray` exactly. Each entry:
  *   { num: '07', kind: 'standard'|'yearly'|'special', years?: number }
  *
- * @param {number} totalDays
- * @param {number} totalMonths  (years*12 + months)
- * @param {boolean} [showSpecial]
- * @returns {Array<{num: string, kind: string, years?: number}>}
+ * `totalMonths` is years*12 + months.
  */
-export function earnedTags(totalDays, totalMonths, showSpecial = false) {
-    /** @type {Array<{num: string, kind: string, years?: number}>} */
-    const tags = [];
+export function earnedTags(totalDays: number, totalMonths: number, showSpecial = false): Tag[] {
+    const tags: Tag[] = [];
 
     if (totalDays >= 1) tags.push({ num: '01', kind: 'standard' });
     if (totalDays >= 30) tags.push({ num: '02', kind: 'standard' });
@@ -139,13 +131,9 @@ export function earnedTags(totalDays, totalMonths, showSpecial = false) {
     return tags;
 }
 
-/**
- * Short English milestone name for a tag, used as the card headline.
- * @param {{num: string, kind: string, years?: number}} tag
- * @returns {string}
- */
-export function milestoneLabel(tag) {
-    const NAMES = {
+/** Short English milestone name for a tag, used as the card headline. */
+export function milestoneLabel(tag: Tag): string {
+    const NAMES: Record<string, string> = {
         '01': 'Welcome',
         '02': '30 Days',
         '03': '60 Days',
@@ -155,7 +143,8 @@ export function milestoneLabel(tag) {
         '07': '1 Year',
         '08': '18 Months',
     };
-    if (NAMES[tag.num]) return NAMES[tag.num];
+    const name = NAMES[tag.num];
+    if (name) return name;
     if (tag.years) return `${tag.years} Year${tag.years === 1 ? '' : 's'}`;
     return 'Clean Time';
 }

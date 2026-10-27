@@ -42,3 +42,6 @@ export const en = {
     result_years_1_month_and_days_format: 'This is %d years, 1 month and %d days.',
     result_years_months_and_days_format: 'This is %d years, %d months and %d days.',
 };
+
+/** The shape every language pack must satisfy (English is canonical). */
+export type LangPack = typeof en;

@@ -12,7 +12,8 @@
  * members, especially fellowship-specific terms ("clean time", "Just for
  * Today", keytag/llavero/ficha/portachiavi).
  */
-import { sprintf } from './sprintf.js';
+import { sprintf } from './sprintf';
+import type { Tag } from './types';
 
 const UI = {
     en: {
@@ -343,23 +344,26 @@ const UI = {
     },
 };
 
+/** The full set of UI string keys (English is canonical). */
+export type UiStrings = (typeof UI)['en'];
+
 /** Supported UI language codes, in menu order. */
-export const SUPPORTED_UI_LANGS = Object.keys(UI);
+export const SUPPORTED_UI_LANGS: string[] = Object.keys(UI);
 
 /** Resolve the full string set for a language, English-backed per key. */
-export function uiStrings(lang) {
-    return { ...UI.en, ...(UI[lang] ?? {}) };
+export function uiStrings(lang: string): UiStrings {
+    return { ...UI.en, ...((UI as Record<string, Partial<UiStrings>>)[lang] ?? {}) };
 }
 
 /**
  * Pick the best supported language for a list of BCP-47 preferences
  * (e.g. `navigator.languages`), falling back to English.
  */
-export function detectLang(preferred = []) {
-    const list = Array.isArray(preferred) ? preferred : [preferred];
+export function detectLang(preferred: readonly unknown[] | string = []): string {
+    const list = typeof preferred === 'string' ? [preferred] : preferred;
     for (const raw of list) {
         if (typeof raw !== 'string' || !raw) continue;
-        if (UI[raw]) return raw; // exact match (e.g. "zh-Hans")
+        if (SUPPORTED_UI_LANGS.includes(raw)) return raw; // exact match (e.g. "zh-Hans")
         const lower = raw.toLowerCase();
         const base = lower.split('-')[0];
         if (base === 'zh') {
@@ -372,7 +376,7 @@ export function detectLang(preferred = []) {
     return 'en';
 }
 
-const NUM_TO_MS = {
+const NUM_TO_MS: Record<string, keyof UiStrings> = {
     '01': 'ms_welcome',
     '02': 'ms_30d',
     '03': 'ms_60d',
@@ -383,7 +387,7 @@ const NUM_TO_MS = {
     '08': 'ms_18m',
 };
 
-const KEY_TO_MS = {
+const KEY_TO_MS: Record<string, keyof UiStrings> = {
     welcome: 'ms_welcome',
     '30d': 'ms_30d',
     '60d': 'ms_60d',
@@ -395,7 +399,7 @@ const KEY_TO_MS = {
 };
 
 /** Localized headline for an earned tag `{num, years}`. */
-export function milestoneHeadline(tag, t) {
+export function milestoneHeadline(tag: Tag, t: UiStrings): string {
     const key = NUM_TO_MS[tag.num];
     if (key) return t[key];
     if (tag.years === 1) return t.ms_1y;
@@ -404,7 +408,10 @@ export function milestoneHeadline(tag, t) {
 }
 
 /** Localized label for a builder dropdown option `{key, years}`. */
-export function optionLabel(opt, t) {
+export function optionLabel(
+    opt: { key: string; years?: number | null; label: string },
+    t: UiStrings,
+): string {
     const key = KEY_TO_MS[opt.key];
     if (key) return t[key];
     if (opt.years === 1) return t.ms_1y;
@@ -416,14 +423,14 @@ export function optionLabel(opt, t) {
  * Split a title on `{…}` emphasis markers into render segments, e.g.
  * "Send a {Virtual} Keytag" → [{text:'Send a '}, {text:'Virtual', em:true}, …].
  */
-export function splitEmphasis(str) {
-    const parts = [];
+export function splitEmphasis(str: string): Array<{ text: string; em: boolean }> {
+    const parts: Array<{ text: string; em: boolean }> = [];
     const re = /\{([^}]*)\}/g;
     let last = 0;
-    let m;
+    let m: RegExpExecArray | null;
     while ((m = re.exec(str)) !== null) {
         if (m.index > last) parts.push({ text: str.slice(last, m.index), em: false });
-        parts.push({ text: m[1], em: true });
+        parts.push({ text: m[1] ?? '', em: true });
         last = m.index + m[0].length;
     }
     if (last < str.length) parts.push({ text: str.slice(last), em: false });
@@ -431,6 +438,6 @@ export function splitEmphasis(str) {
 }
 
 /** Replace a single `{token}` in a string (for ARIA labels, etc.). */
-export function fillToken(str, token, value) {
+export function fillToken(str: string, token: string, value: string): string {
     return str.replace(`{${token}}`, value);
 }

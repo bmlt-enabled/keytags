@@ -1,7 +1,7 @@
 import { describe, test, expect, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import App from '../../App.svelte';
-import { encodePayload, decodePayload } from '../../lib/encode.js';
+import { encodePayload, decodePayload } from '../../lib/encode';
 
 afterEach(() => {
     window.location.hash = '';
@@ -19,7 +19,7 @@ describe('App routing by URL fragment', () => {
         expect(
             screen.queryByRole('heading', { name: 'Send a Virtual Keytag' }),
         ).not.toBeInTheDocument();
-        expect(container.querySelector('.kt-headline').textContent.trim()).toBe('1 Year');
+        expect(container.querySelector('.kt-headline')!.textContent!.trim()).toBe('1 Year');
         expect(screen.getByRole('button', { name: /Create your own/ })).toBeInTheDocument();
     });
 
@@ -38,7 +38,7 @@ describe('App routing by URL fragment', () => {
         await fireEvent.click(screen.getByLabelText('Exit display view'));
         const payload = decodePayload(window.location.hash);
         expect(payload).toMatchObject({ m: '07', to: 'Sam R.' });
-        expect(payload.v).toBeUndefined();
+        expect(payload!.v).toBeUndefined();
     });
 
     test('an edit payload reopens the builder pre-filled', () => {
@@ -46,7 +46,7 @@ describe('App routing by URL fragment', () => {
         const { container } = render(App);
         expect(screen.getByRole('heading', { name: 'Send a Virtual Keytag' })).toBeInTheDocument();
         expect(screen.getByText(/Editing this keytag/)).toBeInTheDocument();
-        expect(container.querySelector('.kt-headline').textContent.trim()).toBe('1 Year');
+        expect(container.querySelector('.kt-headline')!.textContent!.trim()).toBe('1 Year');
         expect(screen.getByText('For Sam R.')).toBeInTheDocument();
     });
 

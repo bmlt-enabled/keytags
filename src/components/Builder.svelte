@@ -1,14 +1,15 @@
-<script>
+<script lang="ts">
     import { untrack, flushSync } from 'svelte';
     import { toPng } from 'html-to-image';
     import KeytagCard from './KeytagCard.svelte';
-    import { buildCard, milestoneOptions, keyForTag, milestoneForDate } from '../lib/card.js';
-    import { buildShareUrl } from '../lib/encode.js';
-    import { uiStrings, detectLang, optionLabel, splitEmphasis } from '../lib/ui.js';
+    import { buildCard, milestoneOptions, keyForTag, milestoneForDate } from '../lib/card';
+    import { buildShareUrl } from '../lib/encode';
+    import { uiStrings, detectLang, optionLabel, splitEmphasis } from '../lib/ui';
+    import type { MilestoneOption, Payload } from '../lib/types';
 
     // `initial` seeds the form when editing an existing keytag; `onreset` clears
     // the URL back to a blank builder.
-    let { initial = null, onreset } = $props();
+    let { initial = null, onreset }: { initial?: Payload | null; onreset?: () => void } = $props();
 
     const LANGS = [
         { code: 'en', label: 'English' },
@@ -63,9 +64,8 @@
 
     let copied = $state(false);
     let copyError = $state(false);
-    let downloadState = $state('idle'); // 'idle' | 'working' | 'error'
-    let previewEl = $state(null);
-    let exportEl = $state(null);
+    let downloadState = $state<'idle' | 'working' | 'error'>('idle');
+    let exportEl = $state<HTMLDivElement | null>(null);
     let exporting = $state(false);
 
     // The milestone a valid clean date earns (or null). Drives the auto-select
@@ -73,7 +73,9 @@
     const dateTag = $derived(milestoneForDate(cleanDate, special));
     const maxYears = $derived(Math.max(50, dateTag?.years ?? 0));
     const options = $derived(milestoneOptions(special, maxYears));
-    const sel = $derived(options.find((o) => o.key === milestoneKey) ?? options[0]);
+    const sel = $derived<MilestoneOption>(
+        options.find((o) => o.key === milestoneKey) ?? options[0]!,
+    );
 
     const payload = $derived({
         m: sel.num,
@@ -299,7 +301,7 @@
     </section>
 
     <section class="preview" aria-label={t.aria_preview}>
-        <div class="preview-stage" bind:this={previewEl}>
+        <div class="preview-stage">
             <KeytagCard {card} intro={false} />
         </div>
         <p class="hint">{t.hint_flip}</p>

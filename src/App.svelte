@@ -1,7 +1,7 @@
-<script>
-    import { decodePayload, encodePayload, buildShareUrl } from './lib/encode.js';
-    import { buildCard } from './lib/card.js';
-    import { uiStrings } from './lib/ui.js';
+<script lang="ts">
+    import { decodePayload, encodePayload, buildShareUrl } from './lib/encode';
+    import { buildCard } from './lib/card';
+    import { uiStrings } from './lib/ui';
     import Builder from './components/Builder.svelte';
     import KeytagCard from './components/KeytagCard.svelte';
     import DisplayView from './components/DisplayView.svelte';

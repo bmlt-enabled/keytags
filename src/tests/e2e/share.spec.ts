@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { cardPath, SAMPLE_CARD } from './helpers.js';
+import { cardPath, SAMPLE_CARD } from './helpers';
 
 test.describe('Share round-trip', () => {
     test('a shared link renders the recipient card', async ({ page }) => {

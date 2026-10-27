@@ -1,5 +1,4 @@
-/// <reference types="vitest/config" />
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { svelteTesting } from '@testing-library/svelte/vite';
 
@@ -11,13 +10,19 @@ export default defineConfig({
     test: {
         globals: true,
         environment: 'jsdom',
-        setupFiles: './src/tests/unit/setup.js',
-        include: ['src/tests/unit/**/*.{test,spec}.{js,svelte.js}'],
+        setupFiles: './src/tests/unit/setup.ts',
+        include: ['src/tests/unit/**/*.{test,spec}.{js,ts}'],
         coverage: {
             provider: 'v8',
             reporter: ['text', 'cobertura'],
-            include: ['src/**/*.{js,svelte}'],
-            exclude: ['src/tests/**', 'src/main.js', 'src/lib/lang/**', 'src/lib/sprintf.js'],
+            include: ['src/**/*.{ts,svelte}'],
+            exclude: [
+                'src/tests/**',
+                'src/main.ts',
+                'src/lib/types.ts',
+                'src/lib/lang/**',
+                'src/lib/sprintf.ts',
+            ],
             thresholds: {
                 lines: 80,
                 functions: 80,

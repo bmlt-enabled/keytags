@@ -6,7 +6,8 @@ vi.mock('html-to-image', () => ({
     toPng: vi.fn().mockResolvedValue('data:image/png;base64,AAAA'),
 }));
 
-const headline = (container) => container.querySelector('.kt-headline').textContent.trim();
+const headline = (container: HTMLElement) =>
+    container.querySelector('.kt-headline')?.textContent?.trim() ?? '';
 
 describe('Builder', () => {
     test('renders the form and actions', () => {
@@ -24,14 +25,14 @@ describe('Builder', () => {
 
     test('choosing a milestone updates the live preview', async () => {
         const { container } = render(Builder);
-        const milestone = container.querySelectorAll('select')[0];
+        const milestone = container.querySelectorAll('select')[0]!;
         await fireEvent.change(milestone, { target: { value: '1y' } });
         expect(headline(container)).toBe('1 Year');
     });
 
     test('typing a recipient name shows it on the preview', async () => {
         const { container } = render(Builder);
-        const recipient = container.querySelector('input[type="text"]');
+        const recipient = container.querySelector('input[type="text"]')!;
         await fireEvent.input(recipient, { target: { value: 'Jo' } });
         expect(screen.getByText('For Jo')).toBeInTheDocument();
     });
@@ -42,7 +43,7 @@ describe('Builder', () => {
         render(Builder);
         await fireEvent.click(screen.getByRole('button', { name: 'Copy share link' }));
         expect(writeText).toHaveBeenCalledOnce();
-        expect(writeText.mock.calls[0][0]).toContain('#');
+        expect(writeText.mock.calls[0]![0]).toContain('#');
         expect(await screen.findByRole('button', { name: 'Copied!' })).toBeInTheDocument();
     });
 
@@ -51,7 +52,9 @@ describe('Builder', () => {
         Object.assign(navigator, { clipboard: { writeText } });
         render(Builder);
         await fireEvent.click(screen.getByRole('button', { name: 'Copy share link' }));
-        const fallback = await screen.findByLabelText('Share link (copy manually)');
+        const fallback = (await screen.findByLabelText(
+            'Share link (copy manually)',
+        )) as HTMLInputElement;
         expect(fallback.value).toContain('#');
         // The button does not falsely report success.
         expect(screen.queryByRole('button', { name: 'Copied!' })).not.toBeInTheDocument();
@@ -62,12 +65,12 @@ describe('Builder', () => {
         render(Builder);
         await fireEvent.click(screen.getByRole('button', { name: 'Open display view' }));
         expect(open).toHaveBeenCalled();
-        expect(open.mock.calls[0][0]).toContain('#');
+        expect(open.mock.calls[0]![0]).toContain('#');
         open.mockRestore();
     });
 
     test('download image renders the card to a PNG', async () => {
-        const { toPng } = await import('html-to-image');
+        const toPng = vi.mocked((await import('html-to-image')).toPng);
         toPng.mockClear();
         // Stub the anchor click so jsdom doesn't attempt a (download) navigation.
         const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
@@ -80,16 +83,16 @@ describe('Builder', () => {
         // not the interactive 3D preview — the fix for cross-engine PNG export.
         // (The node is detached again once the capture resolves, so assert on
         // its structure directly rather than document attachment.)
-        const captured = toPng.mock.calls[0][0];
+        const captured = toPng.mock.calls[0]![0];
         expect(captured).toHaveClass('export-capture');
-        expect(captured.querySelector('.kt')).toHaveClass('flat');
+        expect(captured.querySelector('.kt')!).toHaveClass('flat');
         expect(captured.querySelector('.kt-front')).not.toBeNull();
         expect(captured.querySelector('.kt-back')).toBeNull();
         click.mockRestore();
     });
 
     test('a failed export shows an error and re-enables the button (finding #10)', async () => {
-        const { toPng } = await import('html-to-image');
+        const toPng = vi.mocked((await import('html-to-image')).toPng);
         toPng.mockRejectedValueOnce(new Error('export failed'));
         render(Builder);
         const button = screen.getByRole('button', { name: 'Download image' });
@@ -130,7 +133,7 @@ describe('Builder', () => {
         vi.useFakeTimers().setSystemTime(new Date(2026, 9, 26));
         try {
             const { container } = render(Builder);
-            const dateInput = container.querySelector('input[type="date"]');
+            const dateInput = container.querySelector('input[type="date"]')!;
             await fireEvent.input(dateInput, { target: { value: '1975-10-26' } });
             expect(headline(container)).toBe('51 Years');
         } finally {
@@ -158,7 +161,7 @@ describe('Builder', () => {
                 props: { initial: { m: '07', d: '2024-10-26', l: 'en' } },
             });
             expect(headline(container)).toBe('1 Year');
-            const dateInput = container.querySelector('input[type="date"]');
+            const dateInput = container.querySelector('input[type="date"]')!;
             await fireEvent.input(dateInput, { target: { value: '2020-10-26' } });
             expect(headline(container)).toBe('6 Years');
         } finally {

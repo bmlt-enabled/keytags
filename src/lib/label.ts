@@ -3,10 +3,11 @@
  * Ported from NACC `nacc2/src/nacc.js` formatYearsBlurb / formatMonthsBlurb
  * and displayCalculationResults, using the shared language packs.
  */
-import { languages } from './lang/index.js';
-import { sprintf } from './sprintf.js';
+import { languages, type LangPack } from './lang/index';
+import { sprintf } from './sprintf';
+import type { DateSpanResult, TimeText } from './types';
 
-function formatYearsBlurb(L, r) {
+function formatYearsBlurb(L: LangPack, r: DateSpanResult): string {
     const { years: y, months: m, days: d } = r;
 
     if (y === 1) {
@@ -31,7 +32,7 @@ function formatYearsBlurb(L, r) {
     return sprintf(L.result_years_months_and_days_format, y, m, d);
 }
 
-function formatMonthsBlurb(L, r) {
+function formatMonthsBlurb(L: LangPack, r: DateSpanResult): string {
     const { months: m, days: d } = r;
     if (m > 1 && d === 0) return sprintf(L.result_months_format, m);
     if (m > 1 && d === 1) return sprintf(L.result_months_and_1_day_format, m);
@@ -40,8 +41,8 @@ function formatMonthsBlurb(L, r) {
 }
 
 /** Resolve a language pack, falling back to English. */
-export function getLang(code) {
-    return languages[code] ?? languages.en;
+export function getLang(code: string): LangPack {
+    return (languages as Record<string, LangPack>)[code] ?? languages.en;
 }
 
 /**
@@ -52,10 +53,8 @@ export function getLang(code) {
  * card should display: the breakdown when there is one, otherwise the day
  * count — so newcomers (1–90 days) still see their exact clean time instead of
  * a blank. An invalid/zero span yields an empty `line` (nothing to celebrate).
- *
- * @returns {{ days: string, main: string, line: string }}
  */
-export function cleanTimeText(r, langCode) {
+export function cleanTimeText(r: DateSpanResult, langCode: string): TimeText {
     const L = getLang(langCode);
 
     if (r.totalDays === 0) return { days: L.result_invalid, main: '', line: '' };

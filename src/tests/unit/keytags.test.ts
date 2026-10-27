@@ -1,12 +1,14 @@
 import { describe, test, expect } from 'vitest';
-import { dateSpan, parseCleanDate, earnedTags, milestoneLabel } from '../../lib/keytags.js';
+import { dateSpan, parseCleanDate, earnedTags, milestoneLabel } from '../../lib/keytags';
+import type { Tag } from '../../lib/types';
 
-const d = (iso) => parseCleanDate(iso);
-const nums = (tags) => tags.map((t) => t.num);
+/** Parse a known-valid date (tests only pass valid ISO strings here). */
+const d = (iso: string): Date => parseCleanDate(iso)!;
+const nums = (tags: Tag[]): string[] => tags.map((t) => t.num);
 
 describe('parseCleanDate', () => {
     test('parses a valid YYYY-MM-DD into a local date', () => {
-        const date = parseCleanDate('2024-03-15');
+        const date = parseCleanDate('2024-03-15')!;
         expect(date.getFullYear()).toBe(2024);
         expect(date.getMonth()).toBe(2); // March = 2
         expect(date.getDate()).toBe(15);
@@ -132,13 +134,13 @@ describe('earnedTags — specialty tags', () => {
         [240, '11'], // 20 years → generic decade multiple
     ])('milestone at %i months maps to tag %s when special on', (months, expected) => {
         const tags = earnedTags(months * 31, months, true);
-        expect(tags.at(-1).num).toBe(expected);
+        expect(tags.at(-1)!.num).toBe(expected);
     });
 
     test('specialty tags are suppressed when special is off', () => {
         const tags = earnedTags(3652, 120, false);
         expect(nums(tags)).not.toContain('10');
-        expect(tags.at(-1).num).toBe('09');
+        expect(tags.at(-1)!.num).toBe('09');
     });
 });
 

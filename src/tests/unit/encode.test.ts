@@ -1,5 +1,6 @@
 import { describe, test, expect } from 'vitest';
-import { encodePayload, decodePayload, buildShareUrl } from '../../lib/encode.js';
+import { encodePayload, decodePayload, buildShareUrl } from '../../lib/encode';
+import type { Payload } from '../../lib/types';
 
 describe('encode / decode round-trip', () => {
     test('preserves a full payload, including unicode', () => {
@@ -37,7 +38,8 @@ describe('decodePayload — bad input', () => {
 });
 
 describe('decodePayload — malformed-but-valid-JSON payloads', () => {
-    const frag = (obj) => '#' + encodePayload(obj);
+    // Deliberately feeds malformed values through the codec to test the guard.
+    const frag = (obj: unknown) => '#' + encodePayload(obj as Payload);
 
     test.each([
         ['an array', ['2025-01-01']],

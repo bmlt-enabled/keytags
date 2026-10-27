@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import { checkA11y, injectAxe } from 'axe-playwright';
-import { cardPath, SAMPLE_CARD } from './helpers.js';
+import { cardPath, SAMPLE_CARD } from './helpers';
 
 const AXE_OPTIONS = {
     axeOptions: {

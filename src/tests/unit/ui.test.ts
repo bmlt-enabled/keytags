@@ -7,7 +7,7 @@ import {
     splitEmphasis,
     fillToken,
     SUPPORTED_UI_LANGS,
-} from '../../lib/ui.js';
+} from '../../lib/ui';
 
 describe('uiStrings', () => {
     test('returns the requested language', () => {

@@ -29,12 +29,12 @@ describe('KeytagCard', () => {
         const faces = container.querySelectorAll('img.kt-face');
         expect(faces).toHaveLength(2);
         // generic mode: front uses the plain (back) image, not _Front
-        expect(faces[0].getAttribute('src')).toMatch(/images\/en\/07\.png$/);
+        expect(faces[0]!.getAttribute('src')).toMatch(/images\/en\/07\.png$/);
     });
 
     test('click flips the tag', async () => {
         const { container } = render(KeytagCard, { props: { card, intro: false } });
-        const stage = container.querySelector('.kt-stage');
+        const stage = container.querySelector('.kt-stage')!;
         expect(stage).not.toHaveClass('flipped');
         await fireEvent.click(stage);
         expect(stage).toHaveClass('flipped');
@@ -42,7 +42,7 @@ describe('KeytagCard', () => {
 
     test('Enter key flips the tag', async () => {
         const { container } = render(KeytagCard, { props: { card, intro: false } });
-        const stage = container.querySelector('.kt-stage');
+        const stage = container.querySelector('.kt-stage')!;
         await fireEvent.keyDown(stage, { key: 'Enter' });
         expect(stage).toHaveClass('flipped');
     });
@@ -74,7 +74,7 @@ describe('KeytagCard', () => {
         expect(faces).toHaveLength(1);
         expect(container.querySelector('.kt-back')).toBeNull();
         // The front face is still the real tag image, and the caption remains.
-        expect(faces[0].getAttribute('src')).toMatch(/images\/en\/07\.png$/);
+        expect(faces[0]!.getAttribute('src')).toMatch(/images\/en\/07\.png$/);
         expect(screen.getByText('1 Year')).toBeInTheDocument();
     });
 });

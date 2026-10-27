@@ -49,12 +49,12 @@ test.describe('Builder', () => {
         await page.evaluate(() => {
             window.__pngHref = null;
             const orig = HTMLAnchorElement.prototype.click;
-            HTMLAnchorElement.prototype.click = function () {
+            HTMLAnchorElement.prototype.click = function (...args) {
                 if (this.download && String(this.href).startsWith('data:image/png')) {
                     window.__pngHref = this.href;
                     return;
                 }
-                return orig.apply(this, arguments);
+                return orig.apply(this, args);
             };
         });
 

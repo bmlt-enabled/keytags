@@ -8,7 +8,7 @@ import {
     tagFront,
     tagBack,
     ringTopSrc,
-} from '../../lib/card.js';
+} from '../../lib/card';
 
 describe('yearlyTag', () => {
     test.each([
@@ -44,8 +44,8 @@ describe('milestoneOptions', () => {
     test('special flag changes the resolved tag number for the 5-year option', () => {
         const off = milestoneOptions(false).find((o) => o.key === 'y5');
         const on = milestoneOptions(true).find((o) => o.key === 'y5');
-        expect(off.num).toBe('09');
-        expect(on.num).toBe('15');
+        expect(off!.num).toBe('09');
+        expect(on!.num).toBe('15');
     });
 
     test('maxYears extends the yearly options beyond 50 (finding #4)', () => {

@@ -1,9 +1,9 @@
-<script>
+<script lang="ts">
     import KeytagCard from './KeytagCard.svelte';
-    import { uiStrings } from '../lib/ui.js';
+    import { uiStrings } from '../lib/ui';
+    import type { CardModel } from '../lib/types';
 
-    /** @type {{ card: object, onexit?: () => void }} */
-    let { card, onexit } = $props();
+    let { card, onexit }: { card: CardModel; onexit?: () => void } = $props();
 
     const t = $derived(uiStrings(card.lang));
 </script>

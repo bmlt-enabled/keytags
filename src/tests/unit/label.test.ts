@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
-import { cleanTimeText, getLang } from '../../lib/label.js';
-import { languages } from '../../lib/lang/index.js';
+import { cleanTimeText, getLang } from '../../lib/label';
+import { languages } from '../../lib/lang/index';
 
 describe('getLang', () => {
     test('returns the requested pack', () => {

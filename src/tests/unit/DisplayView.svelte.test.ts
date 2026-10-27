@@ -8,7 +8,7 @@ const card = {
     showSpecial: false,
     tag: { num: '09', years: 5 },
     headline: '5 Years',
-    timeText: { days: '', main: '' },
+    timeText: { days: '', main: '', line: '' },
     to: 'The Home Group',
     from: '',
     msg: 'Keep coming back!',

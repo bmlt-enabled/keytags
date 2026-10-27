@@ -1,4 +1,6 @@
-export const pt = {
+import type { LangPack } from './en';
+
+export const pt: LangPack = {
     section_title: 'Calculadora de Tempo Limpo',
     prompt: 'Entre com a data que ficou limpo',
     calculate_button_text: 'Calcular',

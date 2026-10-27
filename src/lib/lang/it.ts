@@ -1,4 +1,6 @@
-export const it = {
+import type { LangPack } from './en';
+
+export const it: LangPack = {
     section_title: 'NA Tempo di Pulizia',
     prompt: 'Inserisci la tua data di pulizia',
     calculate_button_text: 'Calcola',

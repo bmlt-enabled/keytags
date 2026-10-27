@@ -1,4 +1,6 @@
-export const zhHant = {
+import type { LangPack } from './en';
+
+export const zhHant: LangPack = {
     section_title: 'NA 清醒時間計算器',
     prompt: '請輸入您的清醒日期',
     calculate_button_text: '計算',

@@ -1,20 +1,27 @@
-<script>
-    import { tagFront, tagBack, ringTopSrc } from '../lib/card.js';
-    import { uiStrings, fillToken } from '../lib/ui.js';
+<script lang="ts">
+    import { tagFront, tagBack, ringTopSrc } from '../lib/card';
+    import { uiStrings, fillToken } from '../lib/ui';
+    import type { CardModel } from '../lib/types';
 
-    /**
-     * @typedef {Object} Props
-     * @property {object} card - view-model from buildCard()
-     * @property {boolean} [interactive] - allow click-to-flip
-     * @property {boolean} [showText] - render headline/name/message
-     * @property {boolean} [intro] - play a one-time reveal flip on mount
-     * @property {string} [width] - CSS width for the tag stage
-     * @property {boolean} [flat] - render a single flat front face (no 3D flip);
-     *   used for PNG export, where `preserve-3d` / `backface-visibility` serialize
-     *   unreliably (mirrored text in Chromium, a missing tag in WebKit).
-     */
+    interface Props {
+        /** view-model from buildCard() */
+        card: CardModel;
+        /** allow click-to-flip */
+        interactive?: boolean;
+        /** render headline/name/message */
+        showText?: boolean;
+        /** play a one-time reveal flip on mount */
+        intro?: boolean;
+        /** CSS width for the tag stage */
+        width?: string;
+        /**
+         * Render a single flat front face (no 3D flip); used for PNG export,
+         * where `preserve-3d` / `backface-visibility` serialize unreliably
+         * (mirrored text in Chromium, a missing tag in WebKit).
+         */
+        flat?: boolean;
+    }
 
-    /** @type {Props} */
     let {
         card,
         interactive = true,
@@ -22,7 +29,7 @@
         intro = true,
         width = 'min(260px, 72vw)',
         flat = false,
-    } = $props();
+    }: Props = $props();
 
     const t = $derived(uiStrings(card.lang));
 
@@ -37,7 +44,7 @@
         if (interactive) flipped = !flipped;
     }
 
-    function onKey(event) {
+    function onKey(event: KeyboardEvent) {
         if (interactive && (event.key === 'Enter' || event.key === ' ')) {
             event.preventDefault();
             toggle();

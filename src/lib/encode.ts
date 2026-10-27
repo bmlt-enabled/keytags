@@ -17,11 +17,12 @@
  *   v   view: "display" for full-screen meeting mode, else card
  */
 
-import { parseCleanDate } from './keytags.js';
-import { languages } from './lang/index.js';
+import { parseCleanDate } from './keytags';
+import { languages } from './lang/index';
+import type { Payload } from './types';
 
 // Allowlists for validating untrusted payloads from shared links.
-const TAG_NUMS = new Set([
+const TAG_NUMS = new Set<string>([
     '01',
     '02',
     '03',
@@ -39,12 +40,12 @@ const TAG_NUMS = new Set([
     '15',
     '16',
 ]);
-const SUPPORTED_LANGS = new Set(Object.keys(languages));
-const VIEWS = new Set(['display', 'edit']);
+const SUPPORTED_LANGS = new Set<string>(Object.keys(languages));
+const VIEWS = new Set<string>(['display', 'edit']);
 // Length caps match the builder's input `maxlength` attributes.
-const STR_MAX = { to: 40, fr: 40, msg: 180 };
+const STR_MAX: Record<'to' | 'fr' | 'msg', number> = { to: 40, fr: 40, msg: 180 };
 
-function isPlainObject(v) {
+function isPlainObject(v: unknown): v is Record<string, unknown> {
     return typeof v === 'object' && v !== null && !Array.isArray(v);
 }
 
@@ -56,14 +57,11 @@ function isPlainObject(v) {
  * corrupt-fragment behavior). Harmless unknowns are normalized rather than
  * rejected: an unsupported language becomes English, and an unknown view flag
  * is dropped to the default card view.
- *
- * @param {unknown} obj
- * @returns {object|null}
  */
-function sanitizePayload(obj) {
+function sanitizePayload(obj: unknown): Payload | null {
     if (!isPlainObject(obj)) return null;
 
-    const out = {};
+    const out: Payload = {};
 
     // Milestone tag number: a known two-digit tag.
     if (obj.m !== undefined) {
@@ -81,6 +79,7 @@ function sanitizePayload(obj) {
 
     // Clean date: a real YYYY-MM-DD within sane year bounds.
     if (obj.d !== undefined) {
+        if (typeof obj.d !== 'string') return null;
         const date = parseCleanDate(obj.d);
         if (!date) return null;
         const year = date.getFullYear();
@@ -89,10 +88,11 @@ function sanitizePayload(obj) {
     }
 
     // Free-text fields: strings within the builder's length limits.
-    for (const key of ['to', 'fr', 'msg']) {
-        if (obj[key] !== undefined) {
-            if (typeof obj[key] !== 'string' || obj[key].length > STR_MAX[key]) return null;
-            out[key] = obj[key];
+    for (const key of ['to', 'fr', 'msg'] as const) {
+        const val = obj[key];
+        if (val !== undefined) {
+            if (typeof val !== 'string' || val.length > STR_MAX[key]) return null;
+            out[key] = val;
         }
     }
 
@@ -114,27 +114,27 @@ function sanitizePayload(obj) {
     return out;
 }
 
-function toBase64Url(str) {
+function toBase64Url(str: string): string {
     const bytes = new TextEncoder().encode(str);
     let binary = '';
     bytes.forEach((b) => (binary += String.fromCharCode(b)));
     return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-function fromBase64Url(b64url) {
+function fromBase64Url(b64url: string): string {
     const b64 = b64url.replace(/-/g, '+').replace(/_/g, '/');
     const binary = atob(b64);
     const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
     return new TextDecoder().decode(bytes);
 }
 
-/** @param {object} payload @returns {string} the encoded fragment (no leading #) */
-export function encodePayload(payload) {
+/** @returns the encoded fragment (no leading #) */
+export function encodePayload(payload: Payload): string {
     return toBase64Url(JSON.stringify(payload));
 }
 
-/** @param {string} fragment (with or without leading #) @returns {object|null} */
-export function decodePayload(fragment) {
+/** Decode (and validate) a fragment, with or without the leading #. */
+export function decodePayload(fragment: string | null | undefined): Payload | null {
     if (!fragment) return null;
     const raw = fragment.startsWith('#') ? fragment.slice(1) : fragment;
     if (!raw) return null;
@@ -146,7 +146,7 @@ export function decodePayload(fragment) {
 }
 
 /** Build a full shareable URL for the current origin + path. */
-export function buildShareUrl(payload) {
+export function buildShareUrl(payload: Payload): string {
     const base = window.location.origin + window.location.pathname;
     return `${base}#${encodePayload(payload)}`;
 }

@@ -2,7 +2,7 @@ import '@testing-library/jest-dom/vitest';
 import { vi } from 'vitest';
 
 // jsdom has no matchMedia; KeytagCard reads prefers-reduced-motion through it.
-globalThis.window.matchMedia = vi.fn().mockImplementation((query) => ({
+window.matchMedia = vi.fn((query: string) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -11,4 +11,4 @@ globalThis.window.matchMedia = vi.fn().mockImplementation((query) => ({
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
-}));
+})) as unknown as typeof window.matchMedia;

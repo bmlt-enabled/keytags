@@ -1,4 +1,6 @@
-export const es = {
+import type { LangPack } from './en';
+
+export const es: LangPack = {
     section_title: 'Calculadora de Tiempo Limpio NA',
     prompt: 'Por favor, entra tu fecha de inicio.',
     calculate_button_text: 'Calcular',

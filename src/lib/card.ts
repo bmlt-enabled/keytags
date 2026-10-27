@@ -2,23 +2,24 @@
  * Turn a URL payload into a card view-model, and provide the milestone menu
  * and image-path helpers shared by every view.
  */
-import { dateSpan, parseCleanDate, earnedTags } from './keytags.js';
-import { cleanTimeText } from './label.js';
-import { milestoneHeadline, uiStrings } from './ui.js';
+import { dateSpan, parseCleanDate, earnedTags } from './keytags';
+import { cleanTimeText } from './label';
+import { milestoneHeadline, uiStrings } from './ui';
+import type { CardModel, MilestoneOption, Payload, Tag, TimeText } from './types';
 
 const BASE = import.meta.env.BASE_URL;
 
-export function tagFront(lang, num, official) {
+export function tagFront(lang: string, num: string, official: boolean): string {
     // Generic (trademark-safe) mode uses the back face for the front too.
     return `${BASE}images/${lang}/${num}${official ? '_Front' : ''}.png`;
 }
-export function tagBack(lang, num) {
+export function tagBack(lang: string, num: string): string {
     return `${BASE}images/${lang}/${num}.png`;
 }
 export const ringTopSrc = `${BASE}images/00_RingTop.png`;
 
 /** The specialty-aware tag number for a whole-year milestone (mirrors createTagsArray). */
-export function yearlyTag(years, showSpecial) {
+export function yearlyTag(years: number, showSpecial: boolean): string {
     const comp = years * 12;
     if (showSpecial) {
         if (comp === 60) return '15';
@@ -49,9 +50,9 @@ const STANDARD = [
  * builder raises it to cover a clean date beyond 50 years, so a long-term
  * milestone is never silently dropped back to "Welcome".
  */
-export function milestoneOptions(showSpecial, maxYears = 50) {
+export function milestoneOptions(showSpecial: boolean, maxYears = 50): MilestoneOption[] {
     const top = Math.max(50, Math.floor(maxYears) || 0);
-    const opts = STANDARD.map((o) => ({ ...o, years: null }));
+    const opts: MilestoneOption[] = STANDARD.map((o) => ({ ...o, years: null }));
     for (let y = 2; y <= top; y++) {
         opts.push({ key: `y${y}`, label: `${y} Years`, num: yearlyTag(y, showSpecial), years: y });
     }
@@ -59,29 +60,32 @@ export function milestoneOptions(showSpecial, maxYears = 50) {
 }
 
 /** Find the menu key that matches an earned tag {num, years}. */
-export function keyForTag(tag) {
+export function keyForTag(tag: Tag): string {
     if (tag.years) return `y${tag.years}`;
     const match = STANDARD.find((o) => o.num === tag.num);
     return match ? match.key : 'welcome';
 }
 
 /** The highest milestone earned as of a clean date. */
-export function milestoneForDate(iso, showSpecial) {
+export function milestoneForDate(iso: string | undefined, showSpecial: boolean): Tag | null {
     const date = parseCleanDate(iso);
     if (!date) return null;
     const span = dateSpan(date);
     const tags = earnedTags(span.totalDays, span.years * 12 + span.months, showSpecial);
-    return tags.length ? tags[tags.length - 1] : { num: '01', kind: 'standard' };
+    return tags.at(-1) ?? { num: '01', kind: 'standard' };
 }
 
 /** Build the presentational model consumed by KeytagCard / DisplayView. */
-export function buildCard(payload) {
+export function buildCard(payload: Payload): CardModel {
     const lang = payload.l || 'en';
     const official = payload.o === 1 || payload.o === true;
     const showSpecial = payload.s === 1 || payload.s === true;
-    const tag = { num: payload.m || '01', years: payload.y || null };
+    const tag: { num: string; years: number | null } = {
+        num: payload.m || '01',
+        years: payload.y || null,
+    };
 
-    let timeText = { days: '', main: '' };
+    let timeText: TimeText = { days: '', main: '', line: '' };
     const date = parseCleanDate(payload.d);
     if (date) timeText = cleanTimeText(dateSpan(date), lang);
 
