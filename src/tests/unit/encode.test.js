@@ -8,7 +8,7 @@ describe('encode / decode round-trip', () => {
             y: 2,
             to: 'Sam R.',
             fr: 'Pat',
-            msg: 'One day at a time 🎉 — ¡felicidades!',
+            msg: 'Just for Today 🎉 — ¡felicidades!',
             l: 'es',
             o: 1,
         };
