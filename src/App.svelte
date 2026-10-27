@@ -63,7 +63,14 @@
         </div>
     </main>
 {:else}
-    <Builder initial={mode === 'edit' ? payload : null} onreset={goBuilder} />
+    <!-- Key on the fragment so the builder remounts (and re-seeds) whenever the
+         routed card changes — e.g. edit → start over → Back, or switching
+         between two edit links. The builder seeds from `initial` only once, and
+         the router otherwise reuses the same instance (finding #5). The hash
+         does not change while typing, so this never remounts mid-edit. -->
+    {#key hash}
+        <Builder initial={mode === 'edit' ? payload : null} onreset={goBuilder} />
+    {/key}
 {/if}
 
 <style>

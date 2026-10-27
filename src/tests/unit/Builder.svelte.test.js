@@ -46,6 +46,17 @@ describe('Builder', () => {
         expect(await screen.findByRole('button', { name: 'Copied!' })).toBeInTheDocument();
     });
 
+    test('copy failure reveals a manual-copy fallback link (finding #10)', async () => {
+        const writeText = vi.fn().mockRejectedValue(new Error('clipboard blocked'));
+        Object.assign(navigator, { clipboard: { writeText } });
+        render(Builder);
+        await fireEvent.click(screen.getByRole('button', { name: 'Copy share link' }));
+        const fallback = await screen.findByLabelText('Share link (copy manually)');
+        expect(fallback.value).toContain('#');
+        // The button does not falsely report success.
+        expect(screen.queryByRole('button', { name: 'Copied!' })).not.toBeInTheDocument();
+    });
+
     test('open display view opens a new tab with the display payload', async () => {
         const open = vi.spyOn(window, 'open').mockImplementation(() => null);
         render(Builder);
@@ -75,6 +86,17 @@ describe('Builder', () => {
         expect(captured.querySelector('.kt-front')).not.toBeNull();
         expect(captured.querySelector('.kt-back')).toBeNull();
         click.mockRestore();
+    });
+
+    test('a failed export shows an error and re-enables the button (finding #10)', async () => {
+        const { toPng } = await import('html-to-image');
+        toPng.mockRejectedValueOnce(new Error('export failed'));
+        render(Builder);
+        const button = screen.getByRole('button', { name: 'Download image' });
+        await fireEvent.click(button);
+        expect(await screen.findByText(/image couldn't be created/i)).toBeInTheDocument();
+        // Button returns to its normal, enabled state so the user can retry.
+        expect(screen.getByRole('button', { name: 'Download image' })).toBeEnabled();
     });
 
     test('the flat export node is only mounted during capture', () => {

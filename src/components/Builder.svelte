@@ -54,6 +54,8 @@
     let milestoneKey = $state(seed.milestoneKey);
 
     let copied = $state(false);
+    let copyError = $state(false);
+    let downloadState = $state('idle'); // 'idle' | 'working' | 'error'
     let previewEl = $state(null);
     let exportEl = $state(null);
     let exporting = $state(false);
@@ -100,12 +102,16 @@
     });
 
     async function copyLink() {
+        copyError = false;
         try {
             await navigator.clipboard.writeText(shareUrl);
             copied = true;
             setTimeout(() => (copied = false), 1800);
         } catch {
+            // Clipboard access can be blocked (permissions, insecure context,
+            // older browsers). Reveal the link so it can be copied by hand.
             copied = false;
+            copyError = true;
         }
     }
 
@@ -118,10 +124,12 @@
         // preview: the flip's preserve-3d / backface-visibility serialize
         // unreliably across engines (mirrored text in Chromium, a missing tag
         // in WebKit). Mount it synchronously just for the capture.
+        if (downloadState === 'working') return;
+        downloadState = 'working';
         exporting = true;
         flushSync();
         try {
-            if (!exportEl) return;
+            if (!exportEl) throw new Error('export node missing');
             // The freshly mounted node's faces must be decoded before capture,
             // or the PNG comes out blank. They share URLs with the (already
             // loaded) preview, so no cache-busting — that would refetch and race.
@@ -142,6 +150,11 @@
             a.href = dataUrl;
             a.download = `keytag-${sel.label.replace(/\s+/g, '-').toLowerCase()}.png`;
             a.click();
+            downloadState = 'idle';
+        } catch {
+            // Export can fail (memory, a face that never decoded). Surface it so
+            // the user knows to retry rather than silently getting nothing.
+            downloadState = 'error';
         } finally {
             exporting = false;
         }
@@ -156,6 +169,9 @@
         special = DEFAULTS.special;
         cleanDate = DEFAULTS.cleanDate;
         milestoneKey = DEFAULTS.milestoneKey;
+        copied = false;
+        copyError = false;
+        downloadState = 'idle';
         onreset?.();
     }
 </script>
@@ -250,9 +266,34 @@
             <button class="btn primary" onclick={copyLink}
                 >{copied ? 'Copied!' : 'Copy share link'}</button
             >
-            <button class="btn" onclick={downloadPng}>Download image</button>
+            <button class="btn" onclick={downloadPng} disabled={downloadState === 'working'}>
+                {downloadState === 'working' ? 'Preparing…' : 'Download image'}
+            </button>
             <button class="btn" onclick={openDisplay}>Open display view</button>
             <button class="btn ghost" onclick={startOver}>Start over</button>
+        </div>
+
+        <!-- Feedback for clipboard/export failures, announced to assistive tech. -->
+        <div class="status" role="status" aria-live="polite">
+            {#if copyError}
+                <p class="status-msg">
+                    Couldn't copy automatically — select the link below and copy it:
+                </p>
+                <!-- svelte-ignore a11y_autofocus -->
+                <input
+                    class="fallback-link"
+                    type="text"
+                    readonly
+                    value={shareUrl}
+                    aria-label="Share link (copy manually)"
+                    onclick={(e) => e.currentTarget.select()}
+                    onfocus={(e) => e.currentTarget.select()}
+                    autofocus
+                />
+            {/if}
+            {#if downloadState === 'error'}
+                <p class="status-msg">The image couldn't be created. Please try again.</p>
+            {/if}
         </div>
     </section>
 
@@ -462,6 +503,33 @@
 
     .btn:active {
         transform: translateY(0);
+    }
+
+    .btn:disabled {
+        cursor: default;
+        opacity: 0.6;
+        transform: none;
+        filter: none;
+    }
+
+    .status {
+        margin-top: 0.9rem;
+    }
+
+    .status:empty {
+        margin-top: 0;
+    }
+
+    .status-msg {
+        margin: 0 0 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--accent);
+    }
+
+    .fallback-link {
+        width: 100%;
+        font-size: 0.85rem;
     }
 
     .preview {

@@ -56,4 +56,36 @@ test.describe('Share round-trip', () => {
         await page.goto('/#not-a-valid-payload');
         await expect(page.getByRole('heading', { name: 'Send a Virtual Keytag' })).toBeVisible();
     });
+
+    test('browser Back after start-over restores the edit form, not a blank one (finding #5)', async ({
+        page,
+    }) => {
+        await page.goto(cardPath(SAMPLE_CARD));
+        await page.getByRole('button', { name: 'Edit this keytag' }).click();
+        await expect(page.locator('input[type="text"]').first()).toHaveValue('Sam R.');
+
+        await page.getByRole('button', { name: 'Start over' }).click();
+        await expect(page.locator('input[type="text"]').first()).toHaveValue('');
+
+        // Going back must re-seed the form from the returning edit fragment.
+        await page.goBack();
+        await expect(page.getByText(/Editing this keytag/)).toBeVisible();
+        await expect(page.locator('input[type="text"]').first()).toHaveValue('Sam R.');
+        await expect(page.locator('.kt-headline')).toHaveText('1 Year');
+    });
+
+    test('a long unbroken message does not overflow the viewport (finding #8)', async ({
+        page,
+    }) => {
+        const longMsg = 'A'.repeat(180);
+        await page.goto(cardPath({ ...SAMPLE_CARD, msg: longMsg }));
+        await expect(page.getByText(`“${longMsg}”`)).toBeVisible();
+
+        const { scrollWidth, innerWidth } = await page.evaluate(() => ({
+            scrollWidth: document.documentElement.scrollWidth,
+            innerWidth: window.innerWidth,
+        }));
+        // No horizontal page overflow (allow a 1px rounding slack).
+        expect(scrollWidth).toBeLessThanOrEqual(innerWidth + 1);
+    });
 });

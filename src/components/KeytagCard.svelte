@@ -180,6 +180,10 @@
     .kt-text {
         text-align: center;
         max-width: 22rem;
+        /* Break long unbroken words/URLs so a message, name or recipient can't
+           stretch the card past the viewport (finding #8). Inherited, so it
+           covers every caption line. */
+        overflow-wrap: anywhere;
     }
 
     .kt-to {

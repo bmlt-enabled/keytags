@@ -49,9 +49,17 @@ The trickiest claims were spot-checked against the code and hold up:
 
 ## Tier 3 — Robustness / UX
 
-7. **#5** Back button restores a stale or blank edit form.
-8. **#8** Long unbroken text overflows mobile layouts.
-9. **#10** Copy and export failures give no error feedback or recovery path.
+7. **#5 Back button restores a stale or blank edit form.** ✅ **Done.** The builder is wrapped in
+   `{#key hash}` in `App.svelte`, so it remounts and re-seeds whenever the routed fragment
+   changes (edit → start over → Back, or switching between edit links). The hash doesn't change
+   while typing, so this never remounts mid-edit. Covered by a browser-history e2e.
+8. **#8 Long unbroken text overflows mobile layouts.** ✅ **Done.** `overflow-wrap: anywhere` on
+   `.kt-text` and `.display-text` (inherited by every caption line) breaks long words/URLs in the
+   card, display, preview and exported-image layouts. Covered by a no-horizontal-overflow e2e.
+9. **#10 Copy and export failures give no error feedback or recovery path.** ✅ **Done.** Copy
+   failures now reveal a selectable manual-copy link; export runs through a `working`/`error`
+   state (button shows "Preparing…" and disables, failure shows a retryable message). Status is
+   in an `aria-live` region for assistive tech. Both paths have regression tests.
 
 ## Tier 4 — Policy decisions and infrastructure (not bugs)
 

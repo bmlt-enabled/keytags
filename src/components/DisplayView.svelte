@@ -64,6 +64,9 @@
 
     .display-text {
         max-width: 42rem;
+        /* Break long unbroken words/URLs so user content can't overflow the
+           full-screen layout (finding #8); inherited by every line below. */
+        overflow-wrap: anywhere;
     }
 
     .display-to {
