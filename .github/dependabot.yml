@@ -1,0 +1,28 @@
+# Dependabot keeps dependencies current and surfaces security advisories as PRs.
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+version: 2
+updates:
+    # npm (dev toolchain + the single runtime dep). Minor/patch bumps are
+    # grouped into one PR to keep noise down; majors come as their own PRs so
+    # breaking changes get reviewed on their own.
+    - package-ecosystem: npm
+      directory: '/'
+      schedule:
+          interval: weekly
+      open-pull-requests-limit: 5
+      groups:
+          minor-and-patch:
+              update-types:
+                  - minor
+                  - patch
+
+    # GitHub Actions used by the test workflow (checkout, setup-node, …).
+    - package-ecosystem: github-actions
+      directory: '/'
+      schedule:
+          interval: weekly
+      groups:
+          actions:
+              update-types:
+                  - minor
+                  - patch
