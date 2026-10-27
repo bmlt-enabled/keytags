@@ -126,7 +126,7 @@
 <div class="builder">
     <section class="form" aria-label="Create a keytag">
         <header class="form-head">
-            <h1>Send a Virtual Keytag</h1>
+            <h1>Send a <em>Virtual</em> Keytag</h1>
             <p>
                 Celebrate someone's clean time. Nothing is stored — the card lives entirely in the
                 link you share.
@@ -229,66 +229,89 @@
 
 <style>
     .builder {
-        max-width: 1040px;
+        max-width: 1060px;
         margin: 0 auto;
-        padding: 2rem 1rem 4rem;
+        padding: clamp(2rem, 6vw, 4rem) 1rem 5rem;
         display: grid;
         grid-template-columns: 1fr;
-        gap: 2rem;
+        gap: 2.5rem;
     }
 
-    @media (min-width: 820px) {
+    @media (min-width: 840px) {
         .builder {
-            grid-template-columns: 1.1fr 0.9fr;
+            grid-template-columns: 1.08fr 0.92fr;
+            gap: 3rem;
             align-items: start;
         }
     }
 
+    .form-head {
+        margin-bottom: 2rem;
+    }
+
     .form-head h1 {
-        font-size: clamp(1.8rem, 5vw, 2.4rem);
-        font-weight: 800;
+        font-size: clamp(2.2rem, 6vw, 3.1rem);
+        font-weight: 600;
         letter-spacing: -0.02em;
+    }
+
+    .form-head h1 em {
+        font-style: italic;
+        color: var(--accent);
     }
 
     .form-head p {
         color: var(--muted);
-        margin: 0.5rem 0 1.5rem;
+        max-width: 34ch;
+        margin: 0.75rem 0 0;
+        font-size: 1.02rem;
     }
 
     .field {
         display: block;
-        margin-bottom: 1.1rem;
+        margin-bottom: 1.3rem;
     }
 
     .field > span {
         display: block;
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin-bottom: 0.35rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--ink);
+        margin-bottom: 0.45rem;
     }
 
     .field em {
-        font-weight: 400;
+        font-weight: 500;
         color: var(--muted);
         font-style: normal;
+        letter-spacing: 0.02em;
+        text-transform: none;
     }
 
     .help {
-        margin: 0.35rem 0 0;
-        font-size: 0.8rem;
+        margin: 0.4rem 0 0;
+        font-size: 0.82rem;
         color: var(--muted);
-        line-height: 1.4;
+        line-height: 1.45;
     }
 
     .toggle-help {
-        margin: 0.1rem 0 0.75rem 1.55rem;
+        margin: 0.15rem 0 0.9rem 1.7rem;
     }
 
     .editing {
-        margin: -0.75rem 0 1.5rem;
-        font-size: 0.85rem;
+        margin: 1rem 0 0;
+        display: inline-block;
+        font-size: 0.8rem;
         font-weight: 600;
-        color: var(--link);
+        letter-spacing: 0.02em;
+        color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 12%, transparent);
+        border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+        border-radius: 999px;
+        padding: 0.3rem 0.8rem;
     }
 
     input[type='text'],
@@ -296,63 +319,76 @@
     select,
     textarea {
         width: 100%;
-        padding: 0.65rem 0.75rem;
+        padding: 0.75rem 0.85rem;
         border: 1px solid var(--line);
-        border-radius: 10px;
+        border-radius: var(--radius);
         background: var(--surface);
         color: var(--ink);
         font: inherit;
+        box-shadow: var(--shadow-soft);
+        transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease;
     }
 
     input:focus,
     select:focus,
     textarea:focus {
-        outline: 2px solid var(--accent);
-        outline-offset: 1px;
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
     }
 
     .toggles {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
-        margin: 1rem 0;
+        gap: 0.4rem;
+        margin: 1.25rem 0;
     }
 
     .check {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.6rem;
+        font-weight: 600;
         font-size: 0.95rem;
     }
 
     .check input {
-        width: 1.05rem;
-        height: 1.05rem;
+        width: 1.1rem;
+        height: 1.1rem;
+        accent-color: var(--accent);
     }
 
     .note {
         font-size: 0.85rem;
         color: var(--muted);
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        padding: 0.65rem 0.8rem;
-        margin: 0 0 1rem;
+        background: color-mix(in srgb, var(--accent) 7%, var(--surface));
+        border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--line));
+        border-radius: var(--radius);
+        padding: 0.75rem 0.9rem;
+        margin: 0 0 1.25rem;
     }
 
     .actions {
         display: flex;
         flex-wrap: wrap;
         gap: 0.6rem;
+        margin-top: 1.75rem;
     }
 
     .btn {
-        padding: 0.7rem 1.1rem;
-        border-radius: 10px;
+        padding: 0.72rem 1.2rem;
+        border-radius: var(--radius);
         border: 1px solid var(--line);
         background: var(--surface);
         color: var(--ink);
         font-weight: 600;
+        box-shadow: var(--shadow-soft);
+        transition:
+            transform 0.15s ease,
+            box-shadow 0.15s ease,
+            filter 0.15s ease;
     }
 
     .btn.primary {
@@ -364,11 +400,17 @@
     .btn.ghost {
         background: none;
         border-color: transparent;
+        box-shadow: none;
         color: var(--muted);
     }
 
     .btn:hover {
-        filter: brightness(1.05);
+        transform: translateY(-1px);
+        filter: brightness(1.04);
+    }
+
+    .btn:active {
+        transform: translateY(0);
     }
 
     .preview {
@@ -377,19 +419,77 @@
     }
 
     .preview-stage {
-        background: var(--surface);
+        position: relative;
+        background:
+            radial-gradient(
+                120% 90% at 50% 0%,
+                color-mix(in srgb, var(--accent) 6%, transparent),
+                transparent 55%
+            ),
+            var(--surface);
         border: 1px solid var(--line);
-        border-radius: var(--radius);
+        border-radius: calc(var(--radius) + 6px);
         box-shadow: var(--shadow);
-        padding: 2rem 1.5rem;
+        padding: 2.5rem 1.5rem 2rem;
         display: flex;
         justify-content: center;
+    }
+
+    /* Inner mat line, for a framed-keepsake feel. */
+    .preview-stage::after {
+        content: '';
+        position: absolute;
+        inset: 10px;
+        border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+        border-radius: var(--radius);
+        pointer-events: none;
     }
 
     .hint {
         text-align: center;
         color: var(--muted);
-        font-size: 0.85rem;
-        margin: 0.75rem 0 0;
+        font-size: 0.8rem;
+        letter-spacing: 0.04em;
+        margin: 1rem 0 0;
+    }
+
+    /* Staggered page-load reveal. */
+    @media (prefers-reduced-motion: no-preference) {
+        .form > *,
+        .preview {
+            animation: rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+        }
+        .form > :nth-child(1) {
+            animation-delay: 0.02s;
+        }
+        .form > :nth-child(2) {
+            animation-delay: 0.06s;
+        }
+        .form > :nth-child(3) {
+            animation-delay: 0.1s;
+        }
+        .form > :nth-child(4) {
+            animation-delay: 0.14s;
+        }
+        .form > :nth-child(5) {
+            animation-delay: 0.18s;
+        }
+        .form > :nth-child(n + 6) {
+            animation-delay: 0.22s;
+        }
+        .preview {
+            animation-delay: 0.2s;
+        }
+    }
+
+    @keyframes rise {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 </style>

@@ -161,32 +161,40 @@
     }
 
     .kt-to {
-        margin: 0 0 0.15rem;
+        margin: 0 0 0.3rem;
         color: var(--muted);
-        font-size: 0.95rem;
-        letter-spacing: 0.02em;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
     }
 
     .kt-headline {
-        font-size: clamp(1.6rem, 6vw, 2.2rem);
-        font-weight: 800;
-        letter-spacing: -0.01em;
+        font-size: clamp(1.9rem, 7vw, 2.5rem);
+        font-weight: 600;
+        letter-spacing: -0.02em;
     }
 
     .kt-span {
-        margin: 0.35rem 0 0;
+        margin: 0.4rem 0 0;
         color: var(--muted);
+        font-size: 0.95rem;
     }
 
     .kt-msg {
-        margin: 0.9rem 0 0;
+        margin: 1rem 0 0;
+        font-family: var(--font-display);
         font-style: italic;
-        font-size: 1.1rem;
+        font-weight: 500;
+        font-size: 1.3rem;
+        line-height: 1.35;
+        color: var(--ink);
     }
 
     .kt-from {
-        margin: 0.5rem 0 0;
+        margin: 0.6rem 0 0;
         color: var(--muted);
         font-weight: 600;
+        letter-spacing: 0.02em;
     }
 </style>

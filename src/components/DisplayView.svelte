@@ -42,8 +42,10 @@
         position: fixed;
         inset: 0;
         overflow-y: auto;
-        background: radial-gradient(circle at 50% 30%, #2a2740, #100f17 70%);
-        color: #fff;
+        background:
+            radial-gradient(130% 90% at 50% 12%, rgba(224, 131, 74, 0.16), transparent 55%),
+            radial-gradient(circle at 50% 35%, #2a2015, #0f0b06 72%);
+        color: #f7efe2;
         text-align: center;
     }
 
@@ -65,28 +67,33 @@
     }
 
     .display-to {
-        margin: 0 0 0.4rem;
-        color: #c9c3e6;
-        font-size: clamp(1rem, 3vw, 1.3rem);
-        letter-spacing: 0.04em;
+        margin: 0 0 0.5rem;
+        color: #e8b98c;
+        font-size: clamp(0.8rem, 2vw, 1rem);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
     }
 
     .display-headline {
-        font-size: clamp(2.2rem, 7vw, 4rem);
-        font-weight: 800;
-        letter-spacing: -0.02em;
+        font-size: clamp(2.4rem, 8vw, 4.5rem);
+        font-weight: 600;
+        letter-spacing: -0.025em;
     }
 
     .display-span {
-        margin: 0.5rem 0 0;
-        color: #c9c3e6;
+        margin: 0.6rem 0 0;
+        color: #d6c6ad;
         font-size: clamp(1rem, 3vw, 1.5rem);
     }
 
     .display-msg {
-        margin: 1.2rem 0 0;
+        margin: 1.4rem 0 0;
+        font-family: var(--font-display);
         font-style: italic;
-        font-size: clamp(1.1rem, 3vw, 1.7rem);
+        font-weight: 500;
+        font-size: clamp(1.3rem, 3.5vw, 2rem);
+        line-height: 1.3;
     }
 
     .display-from {
