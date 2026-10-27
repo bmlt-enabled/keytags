@@ -1,0 +1,45 @@
+import { test, expect } from '@playwright/test';
+import { cardPath, SAMPLE_CARD } from './helpers.js';
+
+test.describe('Share round-trip', () => {
+    test('a shared link renders the recipient card', async ({ page }) => {
+        await page.goto(cardPath(SAMPLE_CARD));
+        await expect(page.locator('.kt-headline')).toHaveText('1 Year');
+        await expect(page.getByText('For Sam R.')).toBeVisible();
+        await expect(page.getByText('“Just for Today”')).toBeVisible();
+        await expect(page.getByText('— Pat')).toBeVisible();
+    });
+
+    test('open full screen → exit returns to the same card, not the builder', async ({
+        page,
+        context,
+    }) => {
+        await page.goto(cardPath(SAMPLE_CARD));
+
+        // "Open full screen" opens the display view in a new tab.
+        const [display] = await Promise.all([
+            context.waitForEvent('page'),
+            page.getByRole('button', { name: 'Open full screen' }).click(),
+        ]);
+        await expect(display.getByRole('heading', { name: '1 Year' })).toBeVisible();
+
+        await display.getByRole('button', { name: 'Exit display view' }).click();
+
+        // Back to the card view — the builder heading must NOT appear.
+        await expect(display.locator('.kt-headline')).toHaveText('1 Year');
+        await expect(display.getByRole('heading', { name: 'Send a Virtual Keytag' })).toHaveCount(
+            0,
+        );
+    });
+
+    test('"create your own" goes to the builder', async ({ page }) => {
+        await page.goto(cardPath(SAMPLE_CARD));
+        await page.getByRole('button', { name: /Create your own/ }).click();
+        await expect(page.getByRole('heading', { name: 'Send a Virtual Keytag' })).toBeVisible();
+    });
+
+    test('a corrupt fragment falls back to the builder', async ({ page }) => {
+        await page.goto('/#not-a-valid-payload');
+        await expect(page.getByRole('heading', { name: 'Send a Virtual Keytag' })).toBeVisible();
+    });
+});

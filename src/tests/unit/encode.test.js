@@ -32,7 +32,7 @@ describe('decodePayload — bad input', () => {
         'returns null for %s',
         (bad) => {
             expect(decodePayload(bad)).toBeNull();
-        }
+        },
     );
 });
 

@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import KeytagCard from '../../components/KeytagCard.svelte';
 
@@ -38,6 +38,28 @@ describe('KeytagCard', () => {
         expect(stage).not.toHaveClass('flipped');
         await fireEvent.click(stage);
         expect(stage).toHaveClass('flipped');
+    });
+
+    test('Enter key flips the tag', async () => {
+        const { container } = render(KeytagCard, { props: { card, intro: false } });
+        const stage = container.querySelector('.kt-stage');
+        await fireEvent.keyDown(stage, { key: 'Enter' });
+        expect(stage).toHaveClass('flipped');
+    });
+
+    test('intro reveals the reading, then settles back to the front', async () => {
+        vi.useFakeTimers();
+        try {
+            const { container } = render(KeytagCard, { props: { card, intro: true } });
+            const stage = container.querySelector('.kt-stage');
+            expect(stage).not.toHaveClass('flipped');
+            await vi.advanceTimersByTimeAsync(1300);
+            expect(stage).toHaveClass('flipped');
+            await vi.advanceTimersByTimeAsync(2600);
+            expect(stage).not.toHaveClass('flipped');
+        } finally {
+            vi.useRealTimers();
+        }
     });
 
     test('hides caption text when showText is false', () => {

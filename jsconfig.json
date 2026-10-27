@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "allowJs": true,
+        "checkJs": false,
+        "strict": true,
+        "isolatedModules": true,
+        "resolveJsonModule": true,
+        "skipLibCheck": true
+    },
+    "include": ["src/**/*.js", "src/**/*.svelte", "vite.config.js", "playwright.config.js"],
+    "exclude": ["node_modules", "dist"]
+}
