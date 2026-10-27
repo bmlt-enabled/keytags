@@ -8,7 +8,7 @@ const card = {
     showSpecial: false,
     tag: { num: '07', years: null },
     headline: '1 Year',
-    timeText: { days: '', main: 'This is 1 year.' },
+    timeText: { days: '', main: 'This is 1 year.', line: 'This is 1 year.' },
     to: 'Sam R.',
     from: 'Pat',
     msg: 'Proud of you.',

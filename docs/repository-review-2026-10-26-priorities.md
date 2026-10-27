@@ -31,15 +31,21 @@ The trickiest claims were spot-checked against the code and hold up:
 
 ## Tier 2 — Shows wrong or missing information
 
-3. **#7 Newcomers (1–89 days) see only "Welcome," no day count.** Ranked _above_ #3: it hits a
-   whole common, emotionally-important user group (newcomers), and the fix is a presentation
-   change (the day sentence is already computed).
-4. **#6 Editing silently bumps the milestone.** Anyone editing an older card is affected;
-   preserve the encoded milestone on edit-load.
-5. **#3 Calendar day-count off by a few days.** Real, but an edge case (borrow across months of
-   differing length) and it touches verbatim-NACC code — decide the anniversary semantics first.
-6. **#4 Clean time beyond 50 years falls back to Welcome.** Same milestone-selection family as
-   #3; rare but very wrong when it happens.
+3. **#7 Newcomers (1–89 days) see only "Welcome," no day count.** ✅ **Done.** `cleanTimeText`
+   now returns a resolved `line` (calendar breakdown past 90 days, otherwise the day count,
+   empty for an invalid span), and both card views render `line`, so newcomers see their exact
+   clean time.
+4. **#6 Editing silently bumps the milestone.** ✅ **Done.** A one-shot `skipDateSync` guard
+   preserves the encoded milestone on initial edit-load (when the payload has both `m` and `d`);
+   later date/special changes still auto-select normally.
+5. **#3 Calendar day-count off by a few days.** ✅ **Done (fixed both places).** `dateSpan` now
+   borrows the length of the month being borrowed _into_ (the month before `now`, in `now`'s
+   year), fixing leap-February and differing-month-length skew; the DST-safe `totalDays` is
+   untouched. Fixed in `keytags.js` **and** in the NACC source (`../nacc/nacc2/src/calc.js`) so
+   the two stay in sync — no divergence. Replaced the test that encoded the wrong 26-day result.
+6. **#4 Clean time beyond 50 years falls back to Welcome.** ✅ **Done.** `milestoneOptions` takes
+   a `maxYears` (floored at 50); the builder raises it to cover a date-derived milestone, so a
+   50+ year clean date keeps its real milestone instead of resetting to Welcome.
 
 ## Tier 3 — Robustness / UX
 

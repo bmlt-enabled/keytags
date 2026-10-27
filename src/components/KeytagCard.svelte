@@ -85,8 +85,8 @@
                 <p class="kt-to">For {card.to}</p>
             {/if}
             <h2 class="kt-headline">{card.headline}</h2>
-            {#if card.timeText.main}
-                <p class="kt-span">{card.timeText.main}</p>
+            {#if card.timeText.line}
+                <p class="kt-span">{card.timeText.line}</p>
             {/if}
             {#if card.msg}
                 <p class="kt-msg">“{card.msg}”</p>

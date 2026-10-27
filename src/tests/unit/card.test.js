@@ -47,6 +47,12 @@ describe('milestoneOptions', () => {
         expect(off.num).toBe('09');
         expect(on.num).toBe('15');
     });
+
+    test('maxYears extends the yearly options beyond 50 (finding #4)', () => {
+        expect(milestoneOptions(false, 53).at(-1)).toMatchObject({ key: 'y53', years: 53 });
+        // Never shrinks below the standard 50-year menu.
+        expect(milestoneOptions(false, 10).at(-1)).toMatchObject({ key: 'y50', years: 50 });
+    });
 });
 
 describe('keyForTag', () => {
@@ -104,6 +110,15 @@ describe('buildCard', () => {
         expect(card.tag).toMatchObject({ num: '01' });
         expect(card.official).toBe(false);
         expect(card.timeText.main).toBe('');
+    });
+
+    test('a newcomer (under 90 days) still gets an exact clean-time line', () => {
+        // Clock is 2026-10-26; 12 days of clean time. The milestone face is
+        // still "Welcome", but the card must show the day count (finding #7).
+        const card = buildCard({ m: '01', d: '2026-10-14' });
+        expect(card.headline).toBe('Welcome');
+        expect(card.timeText.main).toBe('');
+        expect(card.timeText.line).toBe('You have been clean for 12 days!');
     });
 
     test('honors official and special flags', () => {

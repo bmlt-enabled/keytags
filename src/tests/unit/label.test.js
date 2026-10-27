@@ -16,19 +16,29 @@ describe('cleanTimeText', () => {
         expect(cleanTimeText({ totalDays: 0, years: 0, months: 0, days: 0 }, 'en')).toEqual({
             days: languages.en.result_invalid,
             main: '',
+            line: '',
         });
     });
 
-    test('exactly one day', () => {
+    test('exactly one day shows the day count as the display line', () => {
         const r = cleanTimeText({ totalDays: 1, years: 0, months: 0, days: 0 }, 'en');
         expect(r.days).toBe(languages.en.result_1_day);
         expect(r.main).toBe('');
+        expect(r.line).toBe(languages.en.result_1_day);
     });
 
-    test('under 90 days has a day count but no main blurb', () => {
+    test('under 90 days has a day count line but no main blurb', () => {
         const r = cleanTimeText({ totalDays: 45, years: 0, months: 1, days: 15 }, 'en');
         expect(r.days).toContain('45');
         expect(r.main).toBe('');
+        // The newcomer still gets an exact clean-time line (finding #7).
+        expect(r.line).toContain('45');
+        expect(r.line).toBe(r.days);
+    });
+
+    test('past 90 days the display line is the calendar breakdown', () => {
+        const r = cleanTimeText({ totalDays: 183, years: 0, months: 6, days: 0 }, 'en');
+        expect(r.line).toBe('This is 6 months.');
     });
 
     test('months blurb past 90 days', () => {

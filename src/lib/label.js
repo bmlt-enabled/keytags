@@ -45,19 +45,26 @@ export function getLang(code) {
 }
 
 /**
- * The two-line clean-time text for a span.
- * @returns {{ days: string, main: string }}
+ * The clean-time text for a span.
+ *
+ * `main` is the calendar breakdown (years/months/days), which only exists past
+ * 90 days; `days` is the running day count. `line` is the single sentence a
+ * card should display: the breakdown when there is one, otherwise the day
+ * count — so newcomers (1–90 days) still see their exact clean time instead of
+ * a blank. An invalid/zero span yields an empty `line` (nothing to celebrate).
+ *
+ * @returns {{ days: string, main: string, line: string }}
  */
 export function cleanTimeText(r, langCode) {
     const L = getLang(langCode);
 
-    if (r.totalDays === 0) return { days: L.result_invalid, main: '' };
-    if (r.totalDays === 1) return { days: L.result_1_day, main: '' };
+    if (r.totalDays === 0) return { days: L.result_invalid, main: '', line: '' };
+    if (r.totalDays === 1) return { days: L.result_1_day, main: '', line: L.result_1_day };
 
     const days = sprintf(L.result_days_format, r.totalDays);
     let main = '';
     if (r.totalDays > 90) {
         main = r.years > 0 ? formatYearsBlurb(L, r) : formatMonthsBlurb(L, r);
     }
-    return { days, main };
+    return { days, main, line: main || days };
 }

@@ -58,7 +58,11 @@
     let exportEl = $state(null);
     let exporting = $state(false);
 
-    const options = $derived(milestoneOptions(special));
+    // The milestone a valid clean date earns (or null). Drives the auto-select
+    // effect below and widens the menu so a 50+ year date is never dropped.
+    const dateTag = $derived(milestoneForDate(cleanDate, special));
+    const maxYears = $derived(Math.max(50, dateTag?.years ?? 0));
+    const options = $derived(milestoneOptions(special, maxYears));
     const sel = $derived(options.find((o) => o.key === milestoneKey) ?? options[0]);
 
     const payload = $derived({
@@ -78,9 +82,20 @@
 
     const today = new Date().toISOString().slice(0, 10);
 
+    // When editing a saved card that has both a milestone and a clean date,
+    // keep the encoded milestone on load instead of recomputing it from the
+    // date (anniversaries since it was made would otherwise bump it — finding
+    // #6). Skips only the first effect run; later date/special changes still
+    // auto-select normally.
+    let skipDateSync = $state(untrack(() => !!(initial && initial.m && initial.d)));
+
     // A valid clean date auto-selects the milestone it earns.
     $effect(() => {
-        const tag = milestoneForDate(cleanDate, special);
+        const tag = dateTag;
+        if (untrack(() => skipDateSync)) {
+            skipDateSync = false;
+            return;
+        }
         if (tag) milestoneKey = keyForTag(tag);
     });
 

@@ -93,6 +93,46 @@ describe('Builder', () => {
         expect(screen.getByText(/Editing this keytag/)).toBeInTheDocument();
     });
 
+    test('a clean date beyond 50 years shows the milestone, not Welcome (finding #4)', async () => {
+        vi.useFakeTimers().setSystemTime(new Date(2026, 9, 26));
+        try {
+            const { container } = render(Builder);
+            const dateInput = container.querySelector('input[type="date"]');
+            await fireEvent.input(dateInput, { target: { value: '1975-10-26' } });
+            expect(headline(container)).toBe('51 Years');
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    test('editing preserves the saved milestone rather than re-deriving it (finding #6)', () => {
+        vi.useFakeTimers().setSystemTime(new Date(2026, 9, 26));
+        try {
+            // Saved as "1 Year" with a date that is now 2 years old.
+            const { container } = render(Builder, {
+                props: { initial: { m: '07', d: '2024-10-26', l: 'en' } },
+            });
+            expect(headline(container)).toBe('1 Year');
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    test('changing the date after an edit load does re-derive the milestone', async () => {
+        vi.useFakeTimers().setSystemTime(new Date(2026, 9, 26));
+        try {
+            const { container } = render(Builder, {
+                props: { initial: { m: '07', d: '2024-10-26', l: 'en' } },
+            });
+            expect(headline(container)).toBe('1 Year');
+            const dateInput = container.querySelector('input[type="date"]');
+            await fireEvent.input(dateInput, { target: { value: '2020-10-26' } });
+            expect(headline(container)).toBe('6 Years');
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
     test('start over clears the form and calls onreset', async () => {
         const onreset = vi.fn();
         const { container } = render(Builder, {

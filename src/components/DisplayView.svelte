@@ -20,8 +20,8 @@
                 <p class="display-to">For {card.to}</p>
             {/if}
             <h1 class="display-headline">{card.headline}</h1>
-            {#if card.timeText.main}
-                <p class="display-span">{card.timeText.main}</p>
+            {#if card.timeText.line}
+                <p class="display-span">{card.timeText.line}</p>
             {/if}
             {#if card.msg}
                 <p class="display-msg">“{card.msg}”</p>

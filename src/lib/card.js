@@ -41,10 +41,17 @@ const STANDARD = [
     { key: '18m', label: '18 Months', num: '08' },
 ];
 
-/** The ordered milestone menu for the builder dropdown. */
-export function milestoneOptions(showSpecial) {
+/**
+ * The ordered milestone menu for the builder dropdown.
+ *
+ * `maxYears` is the highest whole-year option to include (at least 50). The
+ * builder raises it to cover a clean date beyond 50 years, so a long-term
+ * milestone is never silently dropped back to "Welcome".
+ */
+export function milestoneOptions(showSpecial, maxYears = 50) {
+    const top = Math.max(50, Math.floor(maxYears) || 0);
     const opts = STANDARD.map((o) => ({ ...o, years: null }));
-    for (let y = 2; y <= 50; y++) {
+    for (let y = 2; y <= top; y++) {
         opts.push({ key: `y${y}`, label: `${y} Years`, num: yearlyTag(y, showSpecial), years: y });
     }
     return opts;

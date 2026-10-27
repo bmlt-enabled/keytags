@@ -49,8 +49,33 @@ describe('dateSpan', () => {
 
     test('computes years/months/days with borrow', () => {
         const r = dateSpan(d('2020-01-15'), d('2024-03-10'));
-        // days borrow from January (31): 10 − 15 + 31 = 26
-        expect(r).toMatchObject({ years: 4, months: 1, days: 26 });
+        // Borrow the month before March 2024 = February (leap) = 29:
+        // 10 − 15 + 29 = 24.
+        expect(r).toMatchObject({ years: 4, months: 1, days: 24 });
+    });
+
+    test('borrow uses the length of the month being borrowed into, not the clean-date month', () => {
+        // Feb 28 → Apr 27: borrow March (31), so 1 month and 30 days — finding #3.
+        expect(dateSpan(d('2023-02-28'), d('2023-04-27'))).toMatchObject({
+            years: 0,
+            months: 1,
+            days: 30,
+        });
+    });
+
+    test('borrow across a leap-year February', () => {
+        // Jan 15 → Mar 10, 2024 (leap): borrow Feb = 29, so 1 month and 24 days.
+        expect(dateSpan(d('2024-01-15'), d('2024-03-10'))).toMatchObject({
+            years: 0,
+            months: 1,
+            days: 24,
+        });
+        // Same calendar dates in a non-leap year: Feb = 28, so 1 month and 23 days.
+        expect(dateSpan(d('2023-01-15'), d('2023-03-10'))).toMatchObject({
+            years: 0,
+            months: 1,
+            days: 23,
+        });
     });
 
     test('exact one-year span', () => {
