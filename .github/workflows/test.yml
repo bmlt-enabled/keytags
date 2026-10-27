@@ -1,0 +1,31 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout 🛒
+        uses: actions/checkout@v4
+      - name: node 22 ❇️
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+      - name: install dependencies 📦
+        run: npm ci
+      - name: unit tests + coverage 🧪
+        run: npm run coverage
+      - name: build 📦
+        run: npm run build

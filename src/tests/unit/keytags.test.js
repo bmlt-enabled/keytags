@@ -33,7 +33,8 @@ describe('dateSpan', () => {
 
     test('computes years/months/days with borrow', () => {
         const r = dateSpan(d('2020-01-15'), d('2024-03-10'));
-        expect(r).toMatchObject({ years: 4, months: 1, days: 24 });
+        // days borrow from January (31): 10 − 15 + 31 = 26
+        expect(r).toMatchObject({ years: 4, months: 1, days: 26 });
     });
 
     test('exact one-year span', () => {
