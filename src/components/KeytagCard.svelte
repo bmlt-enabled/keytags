@@ -76,15 +76,20 @@
         onclick={toggle}
         onkeydown={onKey}
     >
-        <img class="kt-ring" src={ringTopSrc} alt="" aria-hidden="true" />
         <div class="kt-flip">
-            <img
-                class="kt-face kt-front"
-                src={tagFront(card.lang, card.tag.num, card.official)}
-                alt={card.headline}
-            />
+            <div class="kt-face kt-front">
+                <img
+                    class="kt-tag"
+                    src={tagFront(card.lang, card.tag.num, card.official)}
+                    alt={card.headline}
+                />
+                <img class="kt-ring" src={ringTopSrc} alt="" aria-hidden="true" />
+            </div>
             {#if !flat}
-                <img class="kt-face kt-back" src={tagBack(card.lang, card.tag.num)} alt="" />
+                <div class="kt-face kt-back">
+                    <img class="kt-tag" src={tagBack(card.lang, card.tag.num)} alt="" />
+                    <img class="kt-ring" src={ringTopSrc} alt="" aria-hidden="true" />
+                </div>
             {/if}
         </div>
     </div>
@@ -132,14 +137,21 @@
         cursor: pointer;
     }
 
+    /* The tag face draws a split ring with a small gap at the very top; this
+       overlay is the matching top arc that bridges that gap into a closed ring.
+       It is cut from the same 320px-wide artwork as the face, so it must render
+       at the same width (100%) and sit at the face's top-centre to line up
+       exactly — mirroring NACC's `background-size:100%; background-position:
+       center top`. One lives in each face so the closed ring rotates with the
+       tag during the flip. */
     .kt-ring {
-        width: 34%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
         display: block;
-        margin-bottom: -8%;
-        position: relative;
         z-index: 2;
         pointer-events: none;
-        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.25));
     }
 
     .kt-flip {
@@ -153,10 +165,18 @@
         transform: rotateY(180deg);
     }
 
+    /* Each face wraps a tag image and its own ring-top arc, so the whole
+       assembly (ring included) rotates together during the flip. */
     .kt-face {
+        position: relative;
         width: 100%;
         display: block;
         backface-visibility: hidden;
+    }
+
+    .kt-tag {
+        width: 100%;
+        display: block;
         filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.28));
     }
 

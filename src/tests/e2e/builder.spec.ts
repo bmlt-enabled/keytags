@@ -4,8 +4,8 @@ test.describe('Builder', () => {
     test('loads with the welcome tag preview', async ({ page }) => {
         await page.goto('/');
         await expect(page.getByRole('heading', { name: 'Send a Virtual Keytag' })).toBeVisible();
-        await expect(page.locator('.kt-headline')).toHaveText('Welcome');
-        await expect(page.locator('img.kt-ring')).toBeVisible();
+        await expect(page.locator('.kt-headline')).toHaveText('24 Hours');
+        await expect(page.locator('.kt-front img.kt-ring')).toBeVisible();
     });
 
     test('live preview updates with milestone and recipient', async ({ page }) => {
@@ -19,13 +19,13 @@ test.describe('Builder', () => {
     test('entering a clean date auto-picks the milestone', async ({ page }) => {
         await page.goto('/');
         await page.locator('input[type="date"]').fill('2025-10-26');
-        // At least a year of clean time → not the welcome tag anymore
-        await expect(page.locator('.kt-headline')).not.toHaveText('Welcome');
+        // At least a year of clean time → not the first-day tag anymore
+        await expect(page.locator('.kt-headline')).not.toHaveText('24 Hours');
     });
 
     test('the tag image actually loads (paths resolve, not a broken image)', async ({ page }) => {
         await page.goto('/');
-        const img = page.locator('img.kt-front');
+        const img = page.locator('.kt-front img.kt-tag');
         await expect(img).toBeVisible();
         const loaded = await img.evaluate((el) => el.complete && el.naturalWidth > 0);
         expect(loaded).toBe(true);
@@ -41,7 +41,9 @@ test.describe('Builder', () => {
         // Wait for the preview tag face to finish loading before exporting.
         await expect
             .poll(() =>
-                page.locator('img.kt-front').evaluate((el) => el.complete && el.naturalWidth > 0),
+                page
+                    .locator('.kt-front img.kt-tag')
+                    .evaluate((el) => el.complete && el.naturalWidth > 0),
             )
             .toBe(true);
 

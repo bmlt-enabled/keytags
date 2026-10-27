@@ -134,7 +134,7 @@ export function earnedTags(totalDays: number, totalMonths: number, showSpecial =
 /** Short English milestone name for a tag, used as the card headline. */
 export function milestoneLabel(tag: Tag): string {
     const NAMES: Record<string, string> = {
-        '01': 'Welcome',
+        '01': '24 Hours',
         '02': '30 Days',
         '03': '60 Days',
         '04': '90 Days',

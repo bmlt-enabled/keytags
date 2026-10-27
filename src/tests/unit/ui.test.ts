@@ -60,7 +60,7 @@ describe('milestoneHeadline', () => {
     const es = uiStrings('es');
 
     test('standard tags map to their localized name', () => {
-        expect(milestoneHeadline({ num: '01' }, en)).toBe('Welcome');
+        expect(milestoneHeadline({ num: '01' }, en)).toBe('24 Hours');
         expect(milestoneHeadline({ num: '07' }, es)).toBe('1 Año');
     });
 
@@ -78,7 +78,7 @@ describe('milestoneHeadline', () => {
 describe('optionLabel', () => {
     const it = uiStrings('it');
     test('standard and yearly options localize', () => {
-        expect(optionLabel({ key: 'welcome', label: 'Welcome' }, it)).toBe('Benvenuto');
+        expect(optionLabel({ key: 'welcome', label: '24 Hours' }, it)).toBe('24 Ore');
         expect(optionLabel({ key: 'y5', years: 5, label: '5 Years' }, it)).toBe('5 Anni');
     });
 });

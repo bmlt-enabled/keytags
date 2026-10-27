@@ -46,9 +46,9 @@
         inset: 0;
         overflow-y: auto;
         background:
-            radial-gradient(130% 90% at 50% 12%, rgba(224, 131, 74, 0.16), transparent 55%),
-            radial-gradient(circle at 50% 35%, #2a2015, #0f0b06 72%);
-        color: #f7efe2;
+            radial-gradient(130% 90% at 50% 12%, rgba(95, 146, 216, 0.2), transparent 55%),
+            radial-gradient(circle at 50% 35%, #15283f, #080d16 72%);
+        color: #eef3fb;
         text-align: center;
     }
 
@@ -74,7 +74,7 @@
 
     .display-to {
         margin: 0 0 0.5rem;
-        color: #e8b98c;
+        color: #a9c6ef;
         font-size: clamp(0.8rem, 2vw, 1rem);
         font-weight: 700;
         text-transform: uppercase;
@@ -89,7 +89,7 @@
 
     .display-span {
         margin: 0.6rem 0 0;
-        color: #d6c6ad;
+        color: #b8c6dc;
         font-size: clamp(1rem, 3vw, 1.5rem);
     }
 
