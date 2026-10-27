@@ -1,8 +1,13 @@
 <script>
+    import { untrack } from 'svelte';
     import { toPng } from 'html-to-image';
     import KeytagCard from './KeytagCard.svelte';
     import { buildCard, milestoneOptions, keyForTag, milestoneForDate } from '../lib/card.js';
     import { buildShareUrl } from '../lib/encode.js';
+
+    // `initial` seeds the form when editing an existing keytag; `onreset` clears
+    // the URL back to a blank builder.
+    let { initial = null, onreset } = $props();
 
     const LANGS = [
         { code: 'en', label: 'English' },
@@ -13,14 +18,40 @@
         { code: 'zh-Hant', label: '繁體中文' },
     ];
 
-    let to = $state('');
-    let from = $state('');
-    let msg = $state('');
-    let lang = $state('en');
-    let official = $state(false);
-    let special = $state(false);
-    let cleanDate = $state('');
-    let milestoneKey = $state('welcome');
+    const DEFAULTS = {
+        to: '',
+        from: '',
+        msg: '',
+        lang: 'en',
+        official: false,
+        special: false,
+        cleanDate: '',
+        milestoneKey: 'welcome',
+    };
+
+    // Seed once from `initial` (untrack: capturing the first value is intended —
+    // the component is remounted when a different keytag is edited).
+    const seed = untrack(() => ({
+        to: initial?.to ?? DEFAULTS.to,
+        from: initial?.fr ?? DEFAULTS.from,
+        msg: initial?.msg ?? DEFAULTS.msg,
+        lang: initial?.l ?? DEFAULTS.lang,
+        official: initial?.o === 1,
+        special: initial?.s === 1,
+        cleanDate: initial?.d ?? DEFAULTS.cleanDate,
+        milestoneKey: initial?.m
+            ? keyForTag({ num: initial.m, years: initial.y })
+            : DEFAULTS.milestoneKey,
+    }));
+
+    let to = $state(seed.to);
+    let from = $state(seed.from);
+    let msg = $state(seed.msg);
+    let lang = $state(seed.lang);
+    let official = $state(seed.official);
+    let special = $state(seed.special);
+    let cleanDate = $state(seed.cleanDate);
+    let milestoneKey = $state(seed.milestoneKey);
 
     let copied = $state(false);
     let previewEl = $state(null);
@@ -78,6 +109,18 @@
         a.download = `keytag-${sel.label.replace(/\s+/g, '-').toLowerCase()}.png`;
         a.click();
     }
+
+    function startOver() {
+        to = DEFAULTS.to;
+        from = DEFAULTS.from;
+        msg = DEFAULTS.msg;
+        lang = DEFAULTS.lang;
+        official = DEFAULTS.official;
+        special = DEFAULTS.special;
+        cleanDate = DEFAULTS.cleanDate;
+        milestoneKey = DEFAULTS.milestoneKey;
+        onreset?.();
+    }
 </script>
 
 <div class="builder">
@@ -88,6 +131,9 @@
                 Celebrate someone's clean time. Nothing is stored — the card lives entirely in the
                 link you share.
             </p>
+            {#if initial}
+                <p class="editing">Editing this keytag — change anything and share a new link.</p>
+            {/if}
         </header>
 
         <label class="field">
@@ -102,14 +148,18 @@
                     <option value={opt.key}>{opt.label}</option>
                 {/each}
             </select>
+            <p class="help">
+                The clean-time tag to celebrate. A clean date below can pick it for you.
+            </p>
         </label>
 
         <label class="field">
-            <span
-                >Clean date <em>(optional — adds exact clean time &amp; auto-picks the tag)</em
-                ></span
-            >
+            <span>Clean date <em>(optional)</em></span>
             <input type="date" bind:value={cleanDate} min="1953-01-01" max={today} />
+            <p class="help">
+                Adds exact clean time to the card (e.g. “This is 1 year”) and auto-selects the
+                matching milestone.
+            </p>
         </label>
 
         <label class="field">
@@ -137,10 +187,18 @@
                 <input type="checkbox" bind:checked={special} />
                 <span>Show specialty long-term tags</span>
             </label>
+            <p class="help toggle-help">
+                Adds commemorative 5-, 10-, 15-, 25- and 30-year tags to the milestone list above.
+            </p>
+
             <label class="check">
                 <input type="checkbox" bind:checked={official} />
                 <span>Use official NA tag faces</span>
             </label>
+            <p class="help toggle-help">
+                Puts the official NA logo on the front of the tag. Leave off (the default) for a
+                plain face.
+            </p>
         </div>
 
         {#if official}
@@ -157,6 +215,7 @@
             >
             <button class="btn" onclick={downloadPng}>Download image</button>
             <button class="btn" onclick={openDisplay}>Open display view</button>
+            <button class="btn ghost" onclick={startOver}>Start over</button>
         </div>
     </section>
 
@@ -212,6 +271,24 @@
         font-weight: 400;
         color: var(--muted);
         font-style: normal;
+    }
+
+    .help {
+        margin: 0.35rem 0 0;
+        font-size: 0.8rem;
+        color: var(--muted);
+        line-height: 1.4;
+    }
+
+    .toggle-help {
+        margin: 0.1rem 0 0.75rem 1.55rem;
+    }
+
+    .editing {
+        margin: -0.75rem 0 1.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--link);
     }
 
     input[type='text'],
@@ -282,6 +359,12 @@
         background: var(--accent);
         color: var(--accent-ink);
         border-color: var(--accent);
+    }
+
+    .btn.ghost {
+        background: none;
+        border-color: transparent;
+        color: var(--muted);
     }
 
     .btn:hover {

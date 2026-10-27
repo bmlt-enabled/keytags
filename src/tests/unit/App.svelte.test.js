@@ -41,6 +41,22 @@ describe('App routing by URL fragment', () => {
         expect(payload.v).toBeUndefined();
     });
 
+    test('an edit payload reopens the builder pre-filled', () => {
+        window.location.hash = '#' + encodePayload({ m: '07', to: 'Sam R.', l: 'en', v: 'edit' });
+        const { container } = render(App);
+        expect(screen.getByRole('heading', { name: 'Send a Virtual Keytag' })).toBeInTheDocument();
+        expect(screen.getByText(/Editing this keytag/)).toBeInTheDocument();
+        expect(container.querySelector('.kt-headline').textContent.trim()).toBe('1 Year');
+        expect(screen.getByText('For Sam R.')).toBeInTheDocument();
+    });
+
+    test('card view: "Edit this keytag" switches the fragment to edit mode', async () => {
+        window.location.hash = '#' + encodePayload({ m: '07', to: 'Sam R.', l: 'en' });
+        render(App);
+        await fireEvent.click(screen.getByRole('button', { name: 'Edit this keytag' }));
+        expect(decodePayload(window.location.hash)).toMatchObject({ m: '07', v: 'edit' });
+    });
+
     test('card view: open full screen opens a tab, create-your-own clears the card', async () => {
         const open = vi.spyOn(window, 'open').mockImplementation(() => null);
         window.location.hash = '#' + encodePayload({ m: '07', to: 'Sam R.', l: 'en' });

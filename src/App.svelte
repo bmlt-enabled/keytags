@@ -15,11 +15,24 @@
 
     const payload = $derived(decodePayload(hash));
     const card = $derived(payload ? buildCard(payload) : null);
-    const mode = $derived(payload ? (payload.v === 'display' ? 'display' : 'card') : 'builder');
+    const mode = $derived(
+        !payload
+            ? 'builder'
+            : payload.v === 'display'
+              ? 'display'
+              : payload.v === 'edit'
+                ? 'edit'
+                : 'card',
+    );
 
     function goBuilder() {
         history.pushState(null, '', window.location.pathname + window.location.search);
         hash = '';
+    }
+
+    // Reopen the builder pre-filled with this card so it can be changed.
+    function goEdit() {
+        window.location.hash = encodePayload({ ...payload, v: 'edit' });
     }
 
     function openDisplay() {
@@ -44,12 +57,13 @@
     <main class="card-page">
         <KeytagCard {card} intro={true} />
         <div class="card-actions">
+            <button class="link-btn" onclick={goEdit}>Edit this keytag</button>
             <button class="link-btn" onclick={openDisplay}>Open full screen</button>
             <button class="link-btn" onclick={goBuilder}>Create your own →</button>
         </div>
     </main>
 {:else}
-    <Builder />
+    <Builder initial={mode === 'edit' ? payload : null} onreset={goBuilder} />
 {/if}
 
 <style>

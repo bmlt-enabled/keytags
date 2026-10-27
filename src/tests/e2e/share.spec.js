@@ -38,6 +38,20 @@ test.describe('Share round-trip', () => {
         await expect(page.getByRole('heading', { name: 'Send a Virtual Keytag' })).toBeVisible();
     });
 
+    test('"edit this keytag" reopens the builder pre-filled', async ({ page }) => {
+        await page.goto(cardPath(SAMPLE_CARD));
+        await page.getByRole('button', { name: 'Edit this keytag' }).click();
+        await expect(page.getByText(/Editing this keytag/)).toBeVisible();
+        // The recipient field is pre-filled and the preview shows it.
+        await expect(page.locator('input[type="text"]').first()).toHaveValue('Sam R.');
+        await expect(page.locator('.kt-headline')).toHaveText('1 Year');
+
+        // Start over clears it back to a blank builder.
+        await page.getByRole('button', { name: 'Start over' }).click();
+        await expect(page.locator('.kt-headline')).toHaveText('Welcome');
+        await expect(page.locator('input[type="text"]').first()).toHaveValue('');
+    });
+
     test('a corrupt fragment falls back to the builder', async ({ page }) => {
         await page.goto('/#not-a-valid-payload');
         await expect(page.getByRole('heading', { name: 'Send a Virtual Keytag' })).toBeVisible();

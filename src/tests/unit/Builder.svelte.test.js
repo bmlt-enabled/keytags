@@ -64,4 +64,25 @@ describe('Builder', () => {
         expect(toPng).toHaveBeenCalled();
         click.mockRestore();
     });
+
+    test('seeds the form from an initial payload (editing)', () => {
+        const { container } = render(Builder, {
+            props: { initial: { m: '07', to: 'Jo', msg: 'Just for Today', l: 'en' } },
+        });
+        expect(headline(container)).toBe('1 Year');
+        expect(screen.getByText('For Jo')).toBeInTheDocument();
+        expect(screen.getByText(/Editing this keytag/)).toBeInTheDocument();
+    });
+
+    test('start over clears the form and calls onreset', async () => {
+        const onreset = vi.fn();
+        const { container } = render(Builder, {
+            props: { initial: { m: '07', to: 'Jo', l: 'en' }, onreset },
+        });
+        expect(headline(container)).toBe('1 Year');
+        await fireEvent.click(screen.getByRole('button', { name: 'Start over' }));
+        expect(headline(container)).toBe('Welcome');
+        expect(screen.queryByText('For Jo')).not.toBeInTheDocument();
+        expect(onreset).toHaveBeenCalledOnce();
+    });
 });
