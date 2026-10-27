@@ -33,7 +33,7 @@ export function yearlyTag(years: number, showSpecial: boolean): string {
 }
 
 const STANDARD = [
-    { key: 'welcome', label: 'Welcome', num: '01' },
+    { key: 'welcome', label: '24 Hours', num: '01' },
     { key: '30d', label: '30 Days', num: '02' },
     { key: '60d', label: '60 Days', num: '03' },
     { key: '90d', label: '90 Days', num: '04' },
@@ -48,7 +48,7 @@ const STANDARD = [
  *
  * `maxYears` is the highest whole-year option to include (at least 50). The
  * builder raises it to cover a clean date beyond 50 years, so a long-term
- * milestone is never silently dropped back to "Welcome".
+ * milestone is never silently dropped back to the first-day tag.
  */
 export function milestoneOptions(showSpecial: boolean, maxYears = 50): MilestoneOption[] {
     const top = Math.max(50, Math.floor(maxYears) || 0);

@@ -26,10 +26,10 @@ describe('KeytagCard', () => {
 
     test('renders generic front + back faces', () => {
         const { container } = render(KeytagCard, { props: { card, intro: false } });
-        const faces = container.querySelectorAll('img.kt-face');
-        expect(faces).toHaveLength(2);
+        const tags = container.querySelectorAll('img.kt-tag');
+        expect(tags).toHaveLength(2);
         // generic mode: front uses the plain (back) image, not _Front
-        expect(faces[0]!.getAttribute('src')).toMatch(/images\/en\/07\.png$/);
+        expect(tags[0]!.getAttribute('src')).toMatch(/images\/en\/07\.png$/);
     });
 
     test('click flips the tag', async () => {
@@ -70,11 +70,11 @@ describe('KeytagCard', () => {
     test('flat mode renders a single front face with no rotated back', () => {
         const { container } = render(KeytagCard, { props: { card, intro: false, flat: true } });
         expect(container.querySelector('.kt')).toHaveClass('flat');
-        const faces = container.querySelectorAll('img.kt-face');
-        expect(faces).toHaveLength(1);
+        const tags = container.querySelectorAll('img.kt-tag');
+        expect(tags).toHaveLength(1);
         expect(container.querySelector('.kt-back')).toBeNull();
         // The front face is still the real tag image, and the caption remains.
-        expect(faces[0]!.getAttribute('src')).toMatch(/images\/en\/07\.png$/);
+        expect(tags[0]!.getAttribute('src')).toMatch(/images\/en\/07\.png$/);
         expect(screen.getByText('1 Year')).toBeInTheDocument();
     });
 });

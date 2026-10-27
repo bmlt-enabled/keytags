@@ -20,7 +20,7 @@ describe('Builder', () => {
 
     test('default preview is the welcome tag', () => {
         const { container } = render(Builder);
-        expect(headline(container)).toBe('Welcome');
+        expect(headline(container)).toBe('24 Hours');
     });
 
     test('choosing a milestone updates the live preview', async () => {
@@ -129,7 +129,7 @@ describe('Builder', () => {
         expect(screen.getByText(/Editing this keytag/)).toBeInTheDocument();
     });
 
-    test('a clean date beyond 50 years shows the milestone, not Welcome (finding #4)', async () => {
+    test('a clean date beyond 50 years shows the milestone, not the first-day tag (finding #4)', async () => {
         vi.useFakeTimers().setSystemTime(new Date(2026, 9, 26));
         try {
             const { container } = render(Builder);
@@ -176,7 +176,7 @@ describe('Builder', () => {
         });
         expect(headline(container)).toBe('1 Year');
         await fireEvent.click(screen.getByRole('button', { name: 'Start over' }));
-        expect(headline(container)).toBe('Welcome');
+        expect(headline(container)).toBe('24 Hours');
         expect(screen.queryByText('For Jo')).not.toBeInTheDocument();
         expect(onreset).toHaveBeenCalledOnce();
     });

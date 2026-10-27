@@ -1,19 +1,20 @@
 :root {
-    /* Warm paper / letterpress palette — keeps the vivid plastic tags the hero. */
-    --bg: #f1e9db;
-    --surface: #fbf6ec;
-    --ink: #241d15;
-    --muted: #6d6252;
-    --line: #e2d7c4;
-    /* Clay/rust accent. --accent is the button fill (white text ≈6:1),
-       --link is the text-link colour — both clear WCAG AA. */
-    --accent: #a8431f;
-    --accent-ink: #fdf7ee;
-    --link: #a8431f;
+    /* BMLT "enamel & steel" palette — cool pressed-paper chrome anchored on the
+       Basic Meeting List Toolbox blue, keeping the vivid plastic tags the hero. */
+    --bg: #e9eef6;
+    --surface: #fbfcfe;
+    --ink: #15233b;
+    --muted: #566579;
+    --line: #d2dced;
+    /* BMLT blue accent. --accent is the button fill (white text ≈6.7:1),
+       --link is the text-link colour (≈6.9:1 on --bg) — both clear WCAG AA. */
+    --accent: #2d5c9e;
+    --accent-ink: #ffffff;
+    --link: #255089;
 
     --radius: 14px;
-    --shadow: 0 18px 50px -24px rgba(58, 38, 18, 0.55);
-    --shadow-soft: 0 2px 10px -4px rgba(58, 38, 18, 0.25);
+    --shadow: 0 18px 50px -24px rgba(21, 35, 59, 0.55);
+    --shadow-soft: 0 2px 10px -4px rgba(21, 35, 59, 0.22);
 
     --font-display: 'Fraunces', 'Hoefler Text', Georgia, serif;
     --font-sans: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
@@ -23,16 +24,16 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --bg: #181309;
-        --surface: #221b11;
-        --ink: #f1e7d7;
-        --muted: #b1a28b;
-        --line: #372d1e;
-        --accent: #e0834a;
-        --accent-ink: #231a10;
-        --link: #eca977;
-        --shadow: 0 22px 60px -26px rgba(0, 0, 0, 0.75);
-        --shadow-soft: 0 2px 12px -4px rgba(0, 0, 0, 0.6);
+        --bg: #0e1724;
+        --surface: #182434;
+        --ink: #e7eef8;
+        --muted: #9aacc6;
+        --line: #27354a;
+        --accent: #5f92d8;
+        --accent-ink: #0b1424;
+        --link: #89b0e8;
+        --shadow: 0 22px 60px -26px rgba(0, 0, 0, 0.78);
+        --shadow-soft: 0 2px 12px -4px rgba(0, 0, 0, 0.62);
     }
 }
 
@@ -49,10 +50,10 @@ body {
 body {
     min-height: 100vh;
     background-color: var(--bg);
-    /* Warm light pooling top-centre + a faint grain, for paper-like depth. */
+    /* Cool light pooling top-centre + a faint grain, for paper-like depth. */
     background-image:
-        radial-gradient(1100px 620px at 50% -8%, rgba(168, 67, 31, 0.1), transparent 60%),
-        radial-gradient(900px 700px at 100% 0%, rgba(214, 170, 92, 0.12), transparent 55%),
+        radial-gradient(1100px 620px at 50% -8%, rgba(45, 92, 158, 0.12), transparent 60%),
+        radial-gradient(900px 700px at 100% 0%, rgba(111, 147, 196, 0.14), transparent 55%),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
     background-attachment: fixed, fixed, fixed;
     background-blend-mode: normal, normal, soft-light;

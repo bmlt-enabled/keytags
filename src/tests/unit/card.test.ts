@@ -114,9 +114,9 @@ describe('buildCard', () => {
 
     test('a newcomer (under 90 days) still gets an exact clean-time line', () => {
         // Clock is 2026-10-26; 12 days of clean time. The milestone face is
-        // still "Welcome", but the card must show the day count (finding #7).
+        // still "24 Hours", but the card must show the day count (finding #7).
         const card = buildCard({ m: '01', d: '2026-10-14' });
-        expect(card.headline).toBe('Welcome');
+        expect(card.headline).toBe('24 Hours');
         expect(card.timeText.main).toBe('');
         expect(card.timeText.line).toBe('You have been clean for 12 days!');
     });
@@ -130,7 +130,7 @@ describe('buildCard', () => {
 
     test('localizes the headline to the card language (finding #9)', () => {
         expect(buildCard({ m: '07', l: 'es' }).headline).toBe('1 Año');
-        expect(buildCard({ m: '01', l: 'it' }).headline).toBe('Benvenuto');
+        expect(buildCard({ m: '01', l: 'it' }).headline).toBe('24 Ore');
     });
 });
 

@@ -48,7 +48,7 @@ test.describe('Share round-trip', () => {
 
         // Start over clears it back to a blank builder.
         await page.getByRole('button', { name: 'Start over' }).click();
-        await expect(page.locator('.kt-headline')).toHaveText('Welcome');
+        await expect(page.locator('.kt-headline')).toHaveText('24 Hours');
         await expect(page.locator('input[type="text"]').first()).toHaveValue('');
     });
 

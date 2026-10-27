@@ -146,7 +146,7 @@ describe('earnedTags — specialty tags', () => {
 
 describe('milestoneLabel', () => {
     test.each([
-        [{ num: '01' }, 'Welcome'],
+        [{ num: '01' }, '24 Hours'],
         [{ num: '04' }, '90 Days'],
         [{ num: '07' }, '1 Year'],
         [{ num: '08' }, '18 Months'],
