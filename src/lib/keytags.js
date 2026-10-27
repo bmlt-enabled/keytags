@@ -24,7 +24,9 @@ export function dateSpan(fromDate, now = new Date()) {
 
     // Count whole calendar days (DST-safe): normalise both ends to local
     // midnight before dividing, and round rather than floor. See calc.js.
-    diff.totalDays = Math.round((startOfDay(now).getTime() - startOfDay(fromDate).getTime()) / 86400000);
+    diff.totalDays = Math.round(
+        (startOfDay(now).getTime() - startOfDay(fromDate).getTime()) / 86400000,
+    );
 
     diff.years = now.getFullYear() - fromDate.getFullYear();
     diff.months = now.getMonth() - fromDate.getMonth();

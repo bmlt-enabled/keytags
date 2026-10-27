@@ -48,7 +48,7 @@
     // A valid clean date auto-selects the milestone it earns.
     $effect(() => {
         const tag = milestoneForDate(cleanDate, special);
-        if (tag) milestoneKey = keyForTag(tag, special);
+        if (tag) milestoneKey = keyForTag(tag);
     });
 
     async function copyLink() {
@@ -68,7 +68,11 @@
     async function downloadPng() {
         if (!previewEl) return;
         const bg = getComputedStyle(document.body).backgroundColor || '#ffffff';
-        const dataUrl = await toPng(previewEl, { pixelRatio: 2, backgroundColor: bg, cacheBust: true });
+        const dataUrl = await toPng(previewEl, {
+            pixelRatio: 2,
+            backgroundColor: bg,
+            cacheBust: true,
+        });
         const a = document.createElement('a');
         a.href = dataUrl;
         a.download = `keytag-${sel.label.replace(/\s+/g, '-').toLowerCase()}.png`;
@@ -80,7 +84,10 @@
     <section class="form" aria-label="Create a keytag">
         <header class="form-head">
             <h1>Send a Virtual Keytag</h1>
-            <p>Celebrate someone's clean time. Nothing is stored — the card lives entirely in the link you share.</p>
+            <p>
+                Celebrate someone's clean time. Nothing is stored — the card lives entirely in the
+                link you share.
+            </p>
         </header>
 
         <label class="field">
@@ -98,13 +105,17 @@
         </label>
 
         <label class="field">
-            <span>Clean date <em>(optional — adds exact clean time &amp; auto-picks the tag)</em></span>
+            <span
+                >Clean date <em>(optional — adds exact clean time &amp; auto-picks the tag)</em
+                ></span
+            >
             <input type="date" bind:value={cleanDate} min="1953-01-01" max={today} />
         </label>
 
         <label class="field">
             <span>Personal message <em>(optional)</em></span>
-            <textarea bind:value={msg} maxlength="180" rows="2" placeholder="Just for Today"></textarea>
+            <textarea bind:value={msg} maxlength="180" rows="2" placeholder="Just for Today"
+            ></textarea>
         </label>
 
         <label class="field">
@@ -134,13 +145,16 @@
 
         {#if official}
             <p class="note">
-                The official NA name and symbol are NAWS registered trademarks. Only enable this if your service
-                body is authorized to use them; otherwise leave it off for generic faces.
+                The official NA name and symbol are NAWS registered trademarks. Only enable this if
+                your service body is authorized to use them; otherwise leave it off for generic
+                faces.
             </p>
         {/if}
 
         <div class="actions">
-            <button class="btn primary" onclick={copyLink}>{copied ? 'Copied!' : 'Copy share link'}</button>
+            <button class="btn primary" onclick={copyLink}
+                >{copied ? 'Copied!' : 'Copy share link'}</button
+            >
             <button class="btn" onclick={downloadPng}>Download image</button>
             <button class="btn" onclick={openDisplay}>Open display view</button>
         </div>

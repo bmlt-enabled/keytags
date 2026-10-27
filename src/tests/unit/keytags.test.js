@@ -16,7 +16,7 @@ describe('parseCleanDate', () => {
         'rejects invalid input %s',
         (bad) => {
             expect(parseCleanDate(bad)).toBeNull();
-        }
+        },
     );
 });
 

@@ -73,7 +73,7 @@
     .link-btn {
         background: none;
         border: none;
-        color: var(--accent);
+        color: var(--link);
         font-weight: 600;
         font-size: 0.95rem;
         text-decoration: underline;

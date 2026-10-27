@@ -1,7 +1,7 @@
-import { describe, test, expect, afterEach } from 'vitest';
-import { render, screen } from '@testing-library/svelte';
+import { describe, test, expect, afterEach, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/svelte';
 import App from '../../App.svelte';
-import { encodePayload } from '../../lib/encode.js';
+import { encodePayload, decodePayload } from '../../lib/encode.js';
 
 afterEach(() => {
     window.location.hash = '';
@@ -16,15 +16,40 @@ describe('App routing by URL fragment', () => {
     test('a card payload shows the recipient card', () => {
         window.location.hash = '#' + encodePayload({ m: '07', to: 'Sam R.', l: 'en' });
         const { container } = render(App);
-        expect(screen.queryByRole('heading', { name: 'Send a Virtual Keytag' })).not.toBeInTheDocument();
+        expect(
+            screen.queryByRole('heading', { name: 'Send a Virtual Keytag' }),
+        ).not.toBeInTheDocument();
         expect(container.querySelector('.kt-headline').textContent.trim()).toBe('1 Year');
         expect(screen.getByRole('button', { name: /Create your own/ })).toBeInTheDocument();
     });
 
     test('a display payload shows the full-screen view', () => {
-        window.location.hash = '#' + encodePayload({ m: '07', to: 'Sam R.', l: 'en', v: 'display' });
+        window.location.hash =
+            '#' + encodePayload({ m: '07', to: 'Sam R.', l: 'en', v: 'display' });
         render(App);
         expect(screen.getByRole('heading', { name: '1 Year' })).toBeInTheDocument();
         expect(screen.getByLabelText('Exit display view')).toBeInTheDocument();
+    });
+
+    test('exiting full-screen returns to the same keytag (not the builder)', async () => {
+        window.location.hash =
+            '#' + encodePayload({ m: '07', to: 'Sam R.', l: 'en', v: 'display' });
+        render(App);
+        await fireEvent.click(screen.getByLabelText('Exit display view'));
+        const payload = decodePayload(window.location.hash);
+        expect(payload).toMatchObject({ m: '07', to: 'Sam R.' });
+        expect(payload.v).toBeUndefined();
+    });
+
+    test('card view: open full screen opens a tab, create-your-own clears the card', async () => {
+        const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+        window.location.hash = '#' + encodePayload({ m: '07', to: 'Sam R.', l: 'en' });
+        render(App);
+        await fireEvent.click(screen.getByRole('button', { name: 'Open full screen' }));
+        expect(open).toHaveBeenCalled();
+        open.mockRestore();
+
+        await fireEvent.click(screen.getByRole('button', { name: /Create your own/ }));
+        expect(window.location.hash).toBe('');
     });
 });

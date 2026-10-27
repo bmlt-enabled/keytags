@@ -1,6 +1,10 @@
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import Builder from '../../components/Builder.svelte';
+
+vi.mock('html-to-image', () => ({
+    toPng: vi.fn().mockResolvedValue('data:image/png;base64,AAAA'),
+}));
 
 const headline = (container) => container.querySelector('.kt-headline').textContent.trim();
 
@@ -30,5 +34,34 @@ describe('Builder', () => {
         const recipient = container.querySelector('input[type="text"]');
         await fireEvent.input(recipient, { target: { value: 'Jo' } });
         expect(screen.getByText('For Jo')).toBeInTheDocument();
+    });
+
+    test('copy share link writes a fragment URL to the clipboard', async () => {
+        const writeText = vi.fn().mockResolvedValue(undefined);
+        Object.assign(navigator, { clipboard: { writeText } });
+        render(Builder);
+        await fireEvent.click(screen.getByRole('button', { name: 'Copy share link' }));
+        expect(writeText).toHaveBeenCalledOnce();
+        expect(writeText.mock.calls[0][0]).toContain('#');
+        expect(await screen.findByRole('button', { name: 'Copied!' })).toBeInTheDocument();
+    });
+
+    test('open display view opens a new tab with the display payload', async () => {
+        const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+        render(Builder);
+        await fireEvent.click(screen.getByRole('button', { name: 'Open display view' }));
+        expect(open).toHaveBeenCalled();
+        expect(open.mock.calls[0][0]).toContain('#');
+        open.mockRestore();
+    });
+
+    test('download image renders the card to a PNG', async () => {
+        const { toPng } = await import('html-to-image');
+        // Stub the anchor click so jsdom doesn't attempt a (download) navigation.
+        const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+        render(Builder);
+        await fireEvent.click(screen.getByRole('button', { name: 'Download image' }));
+        expect(toPng).toHaveBeenCalled();
+        click.mockRestore();
     });
 });

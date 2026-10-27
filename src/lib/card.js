@@ -51,7 +51,7 @@ export function milestoneOptions(showSpecial) {
 }
 
 /** Find the menu key that matches an earned tag {num, years}. */
-export function keyForTag(tag, showSpecial) {
+export function keyForTag(tag) {
     if (tag.years) return `y${tag.years}`;
     const match = STANDARD.find((o) => o.num === tag.num);
     return match ? match.key : 'welcome';

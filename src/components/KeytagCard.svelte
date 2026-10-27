@@ -11,7 +11,13 @@
      */
 
     /** @type {Props} */
-    let { card, interactive = true, showText = true, intro = true, width = 'min(260px, 72vw)' } = $props();
+    let {
+        card,
+        interactive = true,
+        showText = true,
+        intro = true,
+        width = 'min(260px, 72vw)',
+    } = $props();
 
     let flipped = $state(false);
 

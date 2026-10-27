@@ -7,7 +7,13 @@
 
 <div class="display">
     <div class="display-inner">
-        <KeytagCard {card} width="min(380px, 40vh)" intro={true} interactive={true} showText={false} />
+        <KeytagCard
+            {card}
+            width="min(380px, 40vh)"
+            intro={true}
+            interactive={true}
+            showText={false}
+        />
 
         <div class="display-text">
             {#if card.to}
