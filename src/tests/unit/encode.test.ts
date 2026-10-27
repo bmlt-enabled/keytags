@@ -57,7 +57,7 @@ describe('decodePayload — malformed-but-valid-JSON payloads', () => {
     });
 
     test('rejects a non-string recipient name rather than crashing', () => {
-        expect(decodePayload(frag({ m: '07', to: 123, v: 'edit' }))).toBeNull();
+        expect(decodePayload(frag({ m: '07', to: 123 }))).toBeNull();
     });
 
     test('rejects an unknown milestone tag number', () => {
@@ -84,6 +84,8 @@ describe('decodePayload — malformed-but-valid-JSON payloads', () => {
 
     test('drops an unknown view flag to the default card view', () => {
         expect(decodePayload(frag({ m: '07', v: 'bogus' }))).toEqual({ m: '07' });
+        // 'edit' is no longer a view — a legacy edit link falls back to the card.
+        expect(decodePayload(frag({ m: '07', v: 'edit' }))).toEqual({ m: '07' });
     });
 
     test('keeps a valid payload intact', () => {

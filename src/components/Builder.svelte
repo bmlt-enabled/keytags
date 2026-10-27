@@ -1,15 +1,14 @@
 <script lang="ts">
-    import { untrack, flushSync } from 'svelte';
+    import { flushSync } from 'svelte';
     import { toPng } from 'html-to-image';
     import KeytagCard from './KeytagCard.svelte';
     import { buildCard, milestoneOptions, keyForTag, milestoneForDate } from '../lib/card';
     import { buildShareUrl } from '../lib/encode';
     import { uiStrings, detectLang, optionLabel, splitEmphasis } from '../lib/ui';
-    import type { MilestoneOption, Payload } from '../lib/types';
+    import type { MilestoneOption } from '../lib/types';
 
-    // `initial` seeds the form when editing an existing keytag; `onreset` clears
-    // the URL back to a blank builder.
-    let { initial = null, onreset }: { initial?: Payload | null; onreset?: () => void } = $props();
+    // `onreset` clears the URL back to a blank builder.
+    let { onreset }: { onreset?: () => void } = $props();
 
     const LANGS = [
         { code: 'en', label: 'English' },
@@ -20,8 +19,7 @@
         { code: 'zh-Hant', label: '繁體中文' },
     ];
 
-    // Default UI/card language: an edit payload's own language, else the
-    // browser's preferred language, else English.
+    // Default UI/card language: the browser's preferred language, else English.
     const defaultLang =
         typeof navigator !== 'undefined'
             ? detectLang(navigator.languages ?? [navigator.language])
@@ -38,29 +36,14 @@
         milestoneKey: 'welcome',
     };
 
-    // Seed once from `initial` (untrack: capturing the first value is intended —
-    // the component is remounted when a different keytag is edited).
-    const seed = untrack(() => ({
-        to: initial?.to ?? DEFAULTS.to,
-        from: initial?.fr ?? DEFAULTS.from,
-        msg: initial?.msg ?? DEFAULTS.msg,
-        lang: initial?.l ?? DEFAULTS.lang,
-        official: initial?.o === 1,
-        special: initial?.s === 1,
-        cleanDate: initial?.d ?? DEFAULTS.cleanDate,
-        milestoneKey: initial?.m
-            ? keyForTag({ num: initial.m, years: initial.y })
-            : DEFAULTS.milestoneKey,
-    }));
-
-    let to = $state(seed.to);
-    let from = $state(seed.from);
-    let msg = $state(seed.msg);
-    let lang = $state(seed.lang);
-    let official = $state(seed.official);
-    let special = $state(seed.special);
-    let cleanDate = $state(seed.cleanDate);
-    let milestoneKey = $state(seed.milestoneKey);
+    let to = $state(DEFAULTS.to);
+    let from = $state(DEFAULTS.from);
+    let msg = $state(DEFAULTS.msg);
+    let lang = $state(DEFAULTS.lang);
+    let official = $state(DEFAULTS.official);
+    let special = $state(DEFAULTS.special);
+    let cleanDate = $state(DEFAULTS.cleanDate);
+    let milestoneKey = $state(DEFAULTS.milestoneKey);
 
     let copied = $state(false);
     let copyError = $state(false);
@@ -103,20 +86,9 @@
 
     const today = new Date().toISOString().slice(0, 10);
 
-    // When editing a saved card that has both a milestone and a clean date,
-    // keep the encoded milestone on load instead of recomputing it from the
-    // date (anniversaries since it was made would otherwise bump it — finding
-    // #6). Skips only the first effect run; later date/special changes still
-    // auto-select normally.
-    let skipDateSync = $state(untrack(() => !!(initial && initial.m && initial.d)));
-
     // A valid clean date auto-selects the milestone it earns.
     $effect(() => {
         const tag = dateTag;
-        if (untrack(() => skipDateSync)) {
-            skipDateSync = false;
-            return;
-        }
         if (tag) milestoneKey = keyForTag(tag);
     });
 
@@ -203,9 +175,6 @@
                         >{:else}{part.text}{/if}{/each}
             </h1>
             <p>{t.intro}</p>
-            {#if initial}
-                <p class="editing">{t.editing_note}</p>
-            {/if}
         </header>
 
         <label class="field">
@@ -394,19 +363,6 @@
 
     .toggle-help {
         margin: 0.15rem 0 0.9rem 1.7rem;
-    }
-
-    .editing {
-        margin: 1rem 0 0;
-        display: inline-block;
-        font-size: 0.8rem;
-        font-weight: 600;
-        letter-spacing: 0.02em;
-        color: var(--accent);
-        background: color-mix(in srgb, var(--accent) 12%, transparent);
-        border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
-        border-radius: 999px;
-        padding: 0.3rem 0.8rem;
     }
 
     input[type='text'],

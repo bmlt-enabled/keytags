@@ -20,7 +20,7 @@ export interface Payload {
     s?: number | boolean;
     /** clean date (YYYY-MM-DD) */
     d?: string;
-    /** view: "display" | "edit", else card */
+    /** view: "display", else card */
     v?: string;
 }
 

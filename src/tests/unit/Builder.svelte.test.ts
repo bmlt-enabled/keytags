@@ -109,24 +109,20 @@ describe('Builder', () => {
         expect(container.querySelectorAll('.kt-headline')).toHaveLength(1);
     });
 
-    test('an edit payload localizes the whole UI, not just card content (finding #9)', () => {
-        render(Builder, { props: { initial: { m: '07', to: 'Sam', l: 'es' } } });
-        // Action buttons and milestone label are localized, not only the card.
+    test('selecting a language localizes the whole UI, not just card content (finding #9)', async () => {
+        const { container } = render(Builder);
+        const recipient = container.querySelector('input[type="text"]')!;
+        await fireEvent.input(recipient, { target: { value: 'Sam' } });
+        // The language selector is the second <select> (after milestone).
+        const langSelect = container.querySelectorAll('select')[1]!;
+        await fireEvent.change(langSelect, { target: { value: 'es' } });
+        // Action buttons and heading are localized, not only the card.
         expect(screen.getByRole('button', { name: 'Copiar enlace' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Descargar imagen' })).toBeInTheDocument();
         expect(screen.getByText('Para Sam')).toBeInTheDocument();
         expect(
             screen.getByRole('heading', { name: 'Envía un llavero virtual' }),
         ).toBeInTheDocument();
-    });
-
-    test('seeds the form from an initial payload (editing)', () => {
-        const { container } = render(Builder, {
-            props: { initial: { m: '07', to: 'Jo', msg: 'Just for Today', l: 'en' } },
-        });
-        expect(headline(container)).toBe('1 Year');
-        expect(screen.getByText('For Jo')).toBeInTheDocument();
-        expect(screen.getByText(/Editing this keytag/)).toBeInTheDocument();
     });
 
     test('a clean date beyond 50 years shows the milestone, not the first-day tag (finding #4)', async () => {
@@ -141,27 +137,13 @@ describe('Builder', () => {
         }
     });
 
-    test('editing preserves the saved milestone rather than re-deriving it (finding #6)', () => {
+    test('changing the clean date re-derives the milestone each time', async () => {
         vi.useFakeTimers().setSystemTime(new Date(2026, 9, 26));
         try {
-            // Saved as "1 Year" with a date that is now 2 years old.
-            const { container } = render(Builder, {
-                props: { initial: { m: '07', d: '2024-10-26', l: 'en' } },
-            });
-            expect(headline(container)).toBe('1 Year');
-        } finally {
-            vi.useRealTimers();
-        }
-    });
-
-    test('changing the date after an edit load does re-derive the milestone', async () => {
-        vi.useFakeTimers().setSystemTime(new Date(2026, 9, 26));
-        try {
-            const { container } = render(Builder, {
-                props: { initial: { m: '07', d: '2024-10-26', l: 'en' } },
-            });
-            expect(headline(container)).toBe('1 Year');
+            const { container } = render(Builder);
             const dateInput = container.querySelector('input[type="date"]')!;
+            await fireEvent.input(dateInput, { target: { value: '2025-10-26' } });
+            expect(headline(container)).toBe('1 Year');
             await fireEvent.input(dateInput, { target: { value: '2020-10-26' } });
             expect(headline(container)).toBe('6 Years');
         } finally {
@@ -171,10 +153,15 @@ describe('Builder', () => {
 
     test('start over clears the form and calls onreset', async () => {
         const onreset = vi.fn();
-        const { container } = render(Builder, {
-            props: { initial: { m: '07', to: 'Jo', l: 'en' }, onreset },
+        const { container } = render(Builder, { props: { onreset } });
+        const recipient = container.querySelector('input[type="text"]')!;
+        await fireEvent.input(recipient, { target: { value: 'Jo' } });
+        await fireEvent.change(container.querySelectorAll('select')[0]!, {
+            target: { value: '1y' },
         });
         expect(headline(container)).toBe('1 Year');
+        expect(screen.getByText('For Jo')).toBeInTheDocument();
+
         await fireEvent.click(screen.getByRole('button', { name: 'Start over' }));
         expect(headline(container)).toBe('24 Hours');
         expect(screen.queryByText('For Jo')).not.toBeInTheDocument();

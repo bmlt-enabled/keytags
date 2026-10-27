@@ -38,18 +38,11 @@ test.describe('Share round-trip', () => {
         await expect(page.getByRole('heading', { name: 'Send a Virtual Keytag' })).toBeVisible();
     });
 
-    test('"edit this keytag" reopens the builder pre-filled', async ({ page }) => {
+    test('the card view offers full-screen and create-your-own, but no edit', async ({ page }) => {
         await page.goto(cardPath(SAMPLE_CARD));
-        await page.getByRole('button', { name: 'Edit this keytag' }).click();
-        await expect(page.getByText(/Editing this keytag/)).toBeVisible();
-        // The recipient field is pre-filled and the preview shows it.
-        await expect(page.locator('input[type="text"]').first()).toHaveValue('Sam R.');
-        await expect(page.locator('.kt-headline')).toHaveText('1 Year');
-
-        // Start over clears it back to a blank builder.
-        await page.getByRole('button', { name: 'Start over' }).click();
-        await expect(page.locator('.kt-headline')).toHaveText('24 Hours');
-        await expect(page.locator('input[type="text"]').first()).toHaveValue('');
+        await expect(page.getByRole('button', { name: 'Open full screen' })).toBeVisible();
+        await expect(page.getByRole('button', { name: /Create your own/ })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Edit this keytag' })).toHaveCount(0);
     });
 
     test('a card localizes the whole UI to its language and sets <html lang> (finding #9)', async ({
@@ -59,30 +52,15 @@ test.describe('Share round-trip', () => {
         await expect(page.locator('.kt-headline')).toHaveText('1 Año');
         await expect(page.getByText('Para Sam R.')).toBeVisible();
         // Chrome around the card is localized too, not just the card content.
-        await expect(page.getByRole('button', { name: 'Editar este llavero' })).toBeVisible();
+        await expect(
+            page.getByRole('button', { name: 'Abrir en pantalla completa' }),
+        ).toBeVisible();
         await expect(page.locator('html')).toHaveAttribute('lang', 'es');
     });
 
     test('a corrupt fragment falls back to the builder', async ({ page }) => {
         await page.goto('/#not-a-valid-payload');
         await expect(page.getByRole('heading', { name: 'Send a Virtual Keytag' })).toBeVisible();
-    });
-
-    test('browser Back after start-over restores the edit form, not a blank one (finding #5)', async ({
-        page,
-    }) => {
-        await page.goto(cardPath(SAMPLE_CARD));
-        await page.getByRole('button', { name: 'Edit this keytag' }).click();
-        await expect(page.locator('input[type="text"]').first()).toHaveValue('Sam R.');
-
-        await page.getByRole('button', { name: 'Start over' }).click();
-        await expect(page.locator('input[type="text"]').first()).toHaveValue('');
-
-        // Going back must re-seed the form from the returning edit fragment.
-        await page.goBack();
-        await expect(page.getByText(/Editing this keytag/)).toBeVisible();
-        await expect(page.locator('input[type="text"]').first()).toHaveValue('Sam R.');
-        await expect(page.locator('.kt-headline')).toHaveText('1 Year');
     });
 
     test('a long unbroken message does not overflow the viewport (finding #8)', async ({

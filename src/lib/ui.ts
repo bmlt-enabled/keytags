@@ -19,7 +19,6 @@ const UI = {
     en: {
         title: 'Send a {Virtual} Keytag',
         intro: "Celebrate someone's clean time. Nothing is stored — the card lives entirely in the link you share.",
-        editing_note: 'Editing this keytag — change anything and share a new link.',
         field_recipient: "Recipient's name or initial",
         ph_recipient: 'e.g. Sam R.',
         field_milestone: 'Milestone',
@@ -55,7 +54,6 @@ const UI = {
         aria_preview: 'Preview',
         aria_flip: '{headline} keytag — activate to flip',
         label_for: 'For',
-        card_edit: 'Edit this keytag',
         card_fullscreen: 'Open full screen',
         card_create: 'Create your own →',
         display_exit: 'Exit display view',
@@ -74,7 +72,6 @@ const UI = {
     es: {
         title: 'Envía un llavero {virtual}',
         intro: 'Celebra el tiempo limpio de alguien. No se guarda nada — la tarjeta vive por completo en el enlace que compartes.',
-        editing_note: 'Editando este llavero — cambia lo que quieras y comparte un nuevo enlace.',
         field_recipient: 'Nombre o inicial del destinatario',
         ph_recipient: 'p. ej. Sam R.',
         field_milestone: 'Hito',
@@ -111,7 +108,6 @@ const UI = {
         aria_preview: 'Vista previa',
         aria_flip: 'Llavero de {headline} — activa para girar',
         label_for: 'Para',
-        card_edit: 'Editar este llavero',
         card_fullscreen: 'Abrir en pantalla completa',
         card_create: 'Crea el tuyo →',
         display_exit: 'Salir de la vista',
@@ -130,7 +126,6 @@ const UI = {
     pt: {
         title: 'Envie uma ficha {virtual}',
         intro: 'Celebre o tempo limpo de alguém. Nada é armazenado — o cartão vive inteiramente no link que você compartilha.',
-        editing_note: 'Editando esta ficha — mude o que quiser e compartilhe um novo link.',
         field_recipient: 'Nome ou inicial do destinatário',
         ph_recipient: 'ex.: Sam R.',
         field_milestone: 'Marco',
@@ -166,7 +161,6 @@ const UI = {
         aria_preview: 'Pré-visualização',
         aria_flip: 'Ficha de {headline} — ative para virar',
         label_for: 'Para',
-        card_edit: 'Editar esta ficha',
         card_fullscreen: 'Abrir em tela cheia',
         card_create: 'Crie a sua →',
         display_exit: 'Sair da visualização',
@@ -185,8 +179,6 @@ const UI = {
     it: {
         title: 'Invia un portachiavi {virtuale}',
         intro: 'Celebra il tempo di pulizia di qualcuno. Non viene memorizzato nulla — la card vive interamente nel link che condividi.',
-        editing_note:
-            'Modifica di questo portachiavi — cambia ciò che vuoi e condividi un nuovo link.',
         field_recipient: 'Nome o iniziale del destinatario',
         ph_recipient: 'es. Sam R.',
         field_milestone: 'Traguardo',
@@ -223,7 +215,6 @@ const UI = {
         aria_preview: 'Anteprima',
         aria_flip: 'Portachiavi di {headline} — attiva per girare',
         label_for: 'Per',
-        card_edit: 'Modifica questo portachiavi',
         card_fullscreen: 'Apri a schermo intero',
         card_create: 'Crea il tuo →',
         display_exit: 'Esci dalla visualizzazione',
@@ -242,7 +233,6 @@ const UI = {
     'zh-Hans': {
         title: '发送一个{虚拟}钥匙扣',
         intro: '庆祝某人的清醒时间。不存储任何内容——卡片完全存在于你分享的链接中。',
-        editing_note: '正在编辑此钥匙扣——随意修改并分享新链接。',
         field_recipient: '接收者的姓名或缩写',
         ph_recipient: '例如 Sam R.',
         field_milestone: '里程碑',
@@ -275,7 +265,6 @@ const UI = {
         aria_preview: '预览',
         aria_flip: '{headline} 钥匙扣——点击翻转',
         label_for: '致',
-        card_edit: '编辑此钥匙扣',
         card_fullscreen: '打开全屏',
         card_create: '创建你自己的 →',
         display_exit: '退出展示视图',
@@ -294,7 +283,6 @@ const UI = {
     'zh-Hant': {
         title: '發送一個{虛擬}鑰匙扣',
         intro: '慶祝某人的清醒時間。不儲存任何內容——卡片完全存在於你分享的連結中。',
-        editing_note: '正在編輯此鑰匙扣——隨意修改並分享新連結。',
         field_recipient: '接收者的姓名或縮寫',
         ph_recipient: '例如 Sam R.',
         field_milestone: '里程碑',
@@ -327,7 +315,6 @@ const UI = {
         aria_preview: '預覽',
         aria_flip: '{headline} 鑰匙扣——點擊翻轉',
         label_for: '致',
-        card_edit: '編輯此鑰匙扣',
         card_fullscreen: '開啟全螢幕',
         card_create: '建立你自己的 →',
         display_exit: '退出展示檢視',

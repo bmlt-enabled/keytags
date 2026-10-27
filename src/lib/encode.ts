@@ -41,7 +41,7 @@ const TAG_NUMS = new Set<string>([
     '16',
 ]);
 const SUPPORTED_LANGS = new Set<string>(Object.keys(languages));
-const VIEWS = new Set<string>(['display', 'edit']);
+const VIEWS = new Set<string>(['display']);
 // Length caps match the builder's input `maxlength` attributes.
 const STR_MAX: Record<'to' | 'fr' | 'msg', number> = { to: 40, fr: 40, msg: 180 };
 

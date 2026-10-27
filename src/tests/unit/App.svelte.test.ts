@@ -41,20 +41,25 @@ describe('App routing by URL fragment', () => {
         expect(payload!.v).toBeUndefined();
     });
 
-    test('an edit payload reopens the builder pre-filled', () => {
-        window.location.hash = '#' + encodePayload({ m: '07', to: 'Sam R.', l: 'en', v: 'edit' });
-        const { container } = render(App);
-        expect(screen.getByRole('heading', { name: 'Send a Virtual Keytag' })).toBeInTheDocument();
-        expect(screen.getByText(/Editing this keytag/)).toBeInTheDocument();
-        expect(container.querySelector('.kt-headline')!.textContent!.trim()).toBe('1 Year');
-        expect(screen.getByText('For Sam R.')).toBeInTheDocument();
-    });
-
-    test('card view: "Edit this keytag" switches the fragment to edit mode', async () => {
+    test('the card view offers full-screen and create-your-own, but no edit', () => {
         window.location.hash = '#' + encodePayload({ m: '07', to: 'Sam R.', l: 'en' });
         render(App);
-        await fireEvent.click(screen.getByRole('button', { name: 'Edit this keytag' }));
-        expect(decodePayload(window.location.hash)).toMatchObject({ m: '07', v: 'edit' });
+        expect(screen.getByRole('button', { name: 'Open full screen' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Create your own/ })).toBeInTheDocument();
+        // Editing a received keepsake isn't offered — the Builder's live preview
+        // is the editor, and the card view only shows/shares.
+        expect(screen.queryByRole('button', { name: 'Edit this keytag' })).not.toBeInTheDocument();
+    });
+
+    test('a legacy v:edit fragment renders as a plain card (edit mode removed)', () => {
+        window.location.hash = '#' + encodePayload({ m: '07', to: 'Sam R.', l: 'en', v: 'edit' });
+        const { container } = render(App);
+        // Old "edit" links no longer route to the builder; the unknown view is
+        // dropped and the card shows normally.
+        expect(
+            screen.queryByRole('heading', { name: 'Send a Virtual Keytag' }),
+        ).not.toBeInTheDocument();
+        expect(container.querySelector('.kt-headline')!.textContent!.trim()).toBe('1 Year');
     });
 
     test('card view: open full screen opens a tab, create-your-own clears the card', async () => {
