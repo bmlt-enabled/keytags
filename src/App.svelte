@@ -1,6 +1,7 @@
 <script>
     import { decodePayload, encodePayload, buildShareUrl } from './lib/encode.js';
     import { buildCard } from './lib/card.js';
+    import { uiStrings } from './lib/ui.js';
     import Builder from './components/Builder.svelte';
     import KeytagCard from './components/KeytagCard.svelte';
     import DisplayView from './components/DisplayView.svelte';
@@ -24,6 +25,17 @@
                 ? 'edit'
                 : 'card',
     );
+
+    // UI strings for the card-page chrome, in the card's own language.
+    const t = $derived(uiStrings(card?.lang ?? 'en'));
+
+    // Reflect the card's language on <html> for the card/display views. The
+    // builder owns <html lang> while it is mounted (it can change language).
+    $effect(() => {
+        if (mode === 'card' || mode === 'display') {
+            document.documentElement.lang = card?.lang ?? 'en';
+        }
+    });
 
     function goBuilder() {
         history.pushState(null, '', window.location.pathname + window.location.search);
@@ -57,9 +69,9 @@
     <main class="card-page">
         <KeytagCard {card} intro={true} />
         <div class="card-actions">
-            <button class="link-btn" onclick={goEdit}>Edit this keytag</button>
-            <button class="link-btn" onclick={openDisplay}>Open full screen</button>
-            <button class="link-btn" onclick={goBuilder}>Create your own →</button>
+            <button class="link-btn" onclick={goEdit}>{t.card_edit}</button>
+            <button class="link-btn" onclick={openDisplay}>{t.card_fullscreen}</button>
+            <button class="link-btn" onclick={goBuilder}>{t.card_create}</button>
         </div>
     </main>
 {:else}

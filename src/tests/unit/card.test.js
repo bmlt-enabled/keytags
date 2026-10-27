@@ -127,6 +127,11 @@ describe('buildCard', () => {
         expect(card.showSpecial).toBe(true);
         expect(card.headline).toBe('5 Years');
     });
+
+    test('localizes the headline to the card language (finding #9)', () => {
+        expect(buildCard({ m: '07', l: 'es' }).headline).toBe('1 Año');
+        expect(buildCard({ m: '01', l: 'it' }).headline).toBe('Benvenuto');
+    });
 });
 
 describe('image path helpers', () => {

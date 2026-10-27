@@ -1,5 +1,6 @@
 <script>
     import { tagFront, tagBack, ringTopSrc } from '../lib/card.js';
+    import { uiStrings, fillToken } from '../lib/ui.js';
 
     /**
      * @typedef {Object} Props
@@ -22,6 +23,8 @@
         width = 'min(260px, 72vw)',
         flat = false,
     } = $props();
+
+    const t = $derived(uiStrings(card.lang));
 
     let flipped = $state(false);
 
@@ -62,7 +65,7 @@
         class:interactive
         role={interactive ? 'button' : 'img'}
         tabindex={interactive ? 0 : undefined}
-        aria-label={interactive ? `${card.headline} keytag — activate to flip` : card.headline}
+        aria-label={interactive ? fillToken(t.aria_flip, 'headline', card.headline) : card.headline}
         onclick={toggle}
         onkeydown={onKey}
     >
@@ -82,7 +85,7 @@
     {#if showText}
         <figcaption class="kt-text">
             {#if card.to}
-                <p class="kt-to">For {card.to}</p>
+                <p class="kt-to">{t.label_for} {card.to}</p>
             {/if}
             <h2 class="kt-headline">{card.headline}</h2>
             {#if card.timeText.line}

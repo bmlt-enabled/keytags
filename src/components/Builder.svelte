@@ -4,6 +4,7 @@
     import KeytagCard from './KeytagCard.svelte';
     import { buildCard, milestoneOptions, keyForTag, milestoneForDate } from '../lib/card.js';
     import { buildShareUrl } from '../lib/encode.js';
+    import { uiStrings, detectLang, optionLabel, splitEmphasis } from '../lib/ui.js';
 
     // `initial` seeds the form when editing an existing keytag; `onreset` clears
     // the URL back to a blank builder.
@@ -18,11 +19,18 @@
         { code: 'zh-Hant', label: '繁體中文' },
     ];
 
+    // Default UI/card language: an edit payload's own language, else the
+    // browser's preferred language, else English.
+    const defaultLang =
+        typeof navigator !== 'undefined'
+            ? detectLang(navigator.languages ?? [navigator.language])
+            : 'en';
+
     const DEFAULTS = {
         to: '',
         from: '',
         msg: '',
-        lang: 'en',
+        lang: defaultLang,
         official: false,
         special: false,
         cleanDate: '',
@@ -81,6 +89,15 @@
 
     const card = $derived(buildCard(payload));
     const shareUrl = $derived(buildShareUrl(payload));
+
+    // Whole-UI strings follow the selected language.
+    const t = $derived(uiStrings(lang));
+    const titleParts = $derived(splitEmphasis(t.title));
+
+    // Keep <html lang> in sync with the live builder language.
+    $effect(() => {
+        document.documentElement.lang = lang;
+    });
 
     const today = new Date().toISOString().slice(0, 10);
 
@@ -177,57 +194,52 @@
 </script>
 
 <div class="builder">
-    <section class="form" aria-label="Create a keytag">
+    <section class="form" aria-label={t.aria_form}>
         <header class="form-head">
-            <h1>Send a <em>Virtual</em> Keytag</h1>
-            <p>
-                Celebrate someone's clean time. Nothing is stored — the card lives entirely in the
-                link you share.
-            </p>
+            <h1>
+                {#each titleParts as part, i (i)}{#if part.em}<em>{part.text}</em
+                        >{:else}{part.text}{/if}{/each}
+            </h1>
+            <p>{t.intro}</p>
             {#if initial}
-                <p class="editing">Editing this keytag — change anything and share a new link.</p>
+                <p class="editing">{t.editing_note}</p>
             {/if}
         </header>
 
         <label class="field">
-            <span>Recipient's name or initial</span>
-            <input type="text" bind:value={to} maxlength="40" placeholder="e.g. Sam R." />
+            <span>{t.field_recipient}</span>
+            <input type="text" bind:value={to} maxlength="40" placeholder={t.ph_recipient} />
         </label>
 
         <label class="field">
-            <span>Milestone</span>
+            <span>{t.field_milestone}</span>
             <select bind:value={milestoneKey}>
                 {#each options as opt (opt.key)}
-                    <option value={opt.key}>{opt.label}</option>
+                    <option value={opt.key}>{optionLabel(opt, t)}</option>
                 {/each}
             </select>
-            <p class="help">
-                The clean-time tag to celebrate. A clean date below can pick it for you.
-            </p>
+            <p class="help">{t.help_milestone}</p>
         </label>
 
         <label class="field">
-            <span>Clean date <em>(optional)</em></span>
+            <span>{t.field_cleandate} <em>{t.optional}</em></span>
             <input type="date" bind:value={cleanDate} min="1953-01-01" max={today} />
-            <p class="help">
-                Adds exact clean time to the card (e.g. “This is 1 year”) and auto-selects the
-                matching milestone.
-            </p>
+            <p class="help">{t.help_cleandate}</p>
         </label>
 
         <label class="field">
-            <span>Personal message <em>(optional)</em></span>
-            <textarea bind:value={msg} maxlength="180" rows="2" placeholder="Just for Today"
+            <span>{t.field_message} <em>{t.optional}</em></span>
+            <textarea bind:value={msg} maxlength="180" rows="2" placeholder={t.ph_message}
             ></textarea>
         </label>
 
         <label class="field">
-            <span>From <em>(optional)</em></span>
-            <input type="text" bind:value={from} maxlength="40" placeholder="Your name" />
+            <span>{t.field_from} <em>{t.optional}</em></span>
+            <input type="text" bind:value={from} maxlength="40" placeholder={t.ph_from} />
         </label>
 
         <label class="field">
-            <span>Language</span>
+            <span>{t.field_language}</span>
             <select bind:value={lang}>
                 {#each LANGS as l (l.code)}
                     <option value={l.code}>{l.label}</option>
@@ -238,70 +250,59 @@
         <div class="toggles">
             <label class="check">
                 <input type="checkbox" bind:checked={special} />
-                <span>Show specialty long-term tags</span>
+                <span>{t.toggle_special}</span>
             </label>
-            <p class="help toggle-help">
-                Adds commemorative 5-, 10-, 15-, 25- and 30-year tags to the milestone list above.
-            </p>
+            <p class="help toggle-help">{t.help_special}</p>
 
             <label class="check">
                 <input type="checkbox" bind:checked={official} />
-                <span>Use official NA tag faces</span>
+                <span>{t.toggle_official}</span>
             </label>
-            <p class="help toggle-help">
-                Puts the official NA logo on the front of the tag. Leave off (the default) for a
-                plain face.
-            </p>
+            <p class="help toggle-help">{t.help_official}</p>
         </div>
 
         {#if official}
-            <p class="note">
-                The official NA name and symbol are NAWS registered trademarks. Only enable this if
-                your service body is authorized to use them; otherwise leave it off for generic
-                faces.
-            </p>
+            <p class="note">{t.note_trademark}</p>
         {/if}
 
         <div class="actions">
             <button class="btn primary" onclick={copyLink}
-                >{copied ? 'Copied!' : 'Copy share link'}</button
+                >{copied ? t.action_copied : t.action_copy}</button
             >
             <button class="btn" onclick={downloadPng} disabled={downloadState === 'working'}>
-                {downloadState === 'working' ? 'Preparing…' : 'Download image'}
+                {downloadState === 'working' ? t.action_preparing : t.action_download}
             </button>
-            <button class="btn" onclick={openDisplay}>Open display view</button>
-            <button class="btn ghost" onclick={startOver}>Start over</button>
+            <button class="btn" onclick={openDisplay}>{t.action_display}</button>
+            <button class="btn ghost" onclick={startOver}>{t.action_startover}</button>
         </div>
 
         <!-- Feedback for clipboard/export failures, announced to assistive tech. -->
         <div class="status" role="status" aria-live="polite">
             {#if copyError}
-                <p class="status-msg">
-                    Couldn't copy automatically — select the link below and copy it:
-                </p>
+                <p class="status-msg">{t.copy_error}</p>
                 <!-- svelte-ignore a11y_autofocus -->
                 <input
                     class="fallback-link"
                     type="text"
                     readonly
                     value={shareUrl}
-                    aria-label="Share link (copy manually)"
+                    aria-label={t.fallback_label}
                     onclick={(e) => e.currentTarget.select()}
                     onfocus={(e) => e.currentTarget.select()}
                     autofocus
                 />
             {/if}
             {#if downloadState === 'error'}
-                <p class="status-msg">The image couldn't be created. Please try again.</p>
+                <p class="status-msg">{t.download_error}</p>
             {/if}
         </div>
     </section>
 
-    <section class="preview" aria-label="Preview">
+    <section class="preview" aria-label={t.aria_preview}>
         <div class="preview-stage" bind:this={previewEl}>
             <KeytagCard {card} intro={false} />
         </div>
-        <p class="hint">Tap the tag to flip it.</p>
+        <p class="hint">{t.hint_flip}</p>
     </section>
 
     <!-- Flat copy captured by the PNG export (see downloadPng), mounted only

@@ -106,6 +106,17 @@ describe('Builder', () => {
         expect(container.querySelectorAll('.kt-headline')).toHaveLength(1);
     });
 
+    test('an edit payload localizes the whole UI, not just card content (finding #9)', () => {
+        render(Builder, { props: { initial: { m: '07', to: 'Sam', l: 'es' } } });
+        // Action buttons and milestone label are localized, not only the card.
+        expect(screen.getByRole('button', { name: 'Copiar enlace' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Descargar imagen' })).toBeInTheDocument();
+        expect(screen.getByText('Para Sam')).toBeInTheDocument();
+        expect(
+            screen.getByRole('heading', { name: 'Envía un llavero virtual' }),
+        ).toBeInTheDocument();
+    });
+
     test('seeds the form from an initial payload (editing)', () => {
         const { container } = render(Builder, {
             props: { initial: { m: '07', to: 'Jo', msg: 'Just for Today', l: 'en' } },

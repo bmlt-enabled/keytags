@@ -63,8 +63,15 @@ The trickiest claims were spot-checked against the code and hold up:
 
 ## Tier 4 — Policy decisions and infrastructure (not bugs)
 
-10. **#9 Partial localization.** A _scope decision_ ("does the language control apply to the
-    whole UI or only card content?"), not a defect. Resolve the intent before coding.
+10. **#9 Partial localization.** ✅ **Done.** Decision: one language control drives the **whole
+    UI**, auto-detected from the browser (`navigator.languages`) with English fallback; on a
+    shared card the encoded `l` wins (the sender chose it for the recipient). A new `src/lib/ui.js`
+    holds all UI strings for the six languages (English authoritative, per-key English fallback)
+    plus `detectLang`, localized milestone labels, and a title-emphasis splitter. The builder,
+    card, display and card-page chrome are all localized, and `<html lang>` tracks the active
+    language. The Playwright locale is pinned to `en-US` for deterministic builder-view tests.
+    ⚠️ The non-English strings are best-effort and should be reviewed by native NA members
+    (fellowship terms especially); they live in one file to make review easy.
 11. **#11 Test gaps.** Not a standalone phase — fold the specific regressions into each fix above
     (real PNG check with #1, malformed-payload tests with #2, controlled-clock milestone tests
     with #3/#4/#7).

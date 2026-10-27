@@ -1,8 +1,11 @@
 <script>
     import KeytagCard from './KeytagCard.svelte';
+    import { uiStrings } from '../lib/ui.js';
 
     /** @type {{ card: object, onexit?: () => void }} */
     let { card, onexit } = $props();
+
+    const t = $derived(uiStrings(card.lang));
 </script>
 
 <div class="display">
@@ -17,7 +20,7 @@
 
         <div class="display-text">
             {#if card.to}
-                <p class="display-to">For {card.to}</p>
+                <p class="display-to">{t.label_for} {card.to}</p>
             {/if}
             <h1 class="display-headline">{card.headline}</h1>
             {#if card.timeText.line}
@@ -33,7 +36,7 @@
     </div>
 
     {#if onexit}
-        <button class="display-exit" onclick={onexit} aria-label="Exit display view">✕</button>
+        <button class="display-exit" onclick={onexit} aria-label={t.display_exit}>✕</button>
     {/if}
 </div>
 

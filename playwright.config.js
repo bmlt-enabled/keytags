@@ -10,6 +10,9 @@ export default defineConfig({
     use: {
         baseURL: 'http://localhost:5173',
         trace: 'on-first-retry',
+        // Pin the locale so builder-view assertions (which auto-detect the UI
+        // language from the browser) are deterministic across environments.
+        locale: 'en-US',
     },
     projects: [
         { name: 'chromium', use: { ...devices['Desktop Chrome'] } },

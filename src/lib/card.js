@@ -2,8 +2,9 @@
  * Turn a URL payload into a card view-model, and provide the milestone menu
  * and image-path helpers shared by every view.
  */
-import { dateSpan, parseCleanDate, earnedTags, milestoneLabel } from './keytags.js';
+import { dateSpan, parseCleanDate, earnedTags } from './keytags.js';
 import { cleanTimeText } from './label.js';
+import { milestoneHeadline, uiStrings } from './ui.js';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -89,7 +90,7 @@ export function buildCard(payload) {
         official,
         showSpecial,
         tag,
-        headline: milestoneLabel(tag),
+        headline: milestoneHeadline(tag, uiStrings(lang)),
         timeText,
         to: payload.to || '',
         from: payload.fr || '',
