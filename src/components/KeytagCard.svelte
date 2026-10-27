@@ -8,6 +8,9 @@
      * @property {boolean} [showText] - render headline/name/message
      * @property {boolean} [intro] - play a one-time reveal flip on mount
      * @property {string} [width] - CSS width for the tag stage
+     * @property {boolean} [flat] - render a single flat front face (no 3D flip);
+     *   used for PNG export, where `preserve-3d` / `backface-visibility` serialize
+     *   unreliably (mirrored text in Chromium, a missing tag in WebKit).
      */
 
     /** @type {Props} */
@@ -17,6 +20,7 @@
         showText = true,
         intro = true,
         width = 'min(260px, 72vw)',
+        flat = false,
     } = $props();
 
     let flipped = $state(false);
@@ -49,7 +53,7 @@
     });
 </script>
 
-<figure class="kt" class:static={reducedMotion}>
+<figure class="kt" class:static={reducedMotion} class:flat>
     <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
     <div
         class="kt-stage"
@@ -69,7 +73,9 @@
                 src={tagFront(card.lang, card.tag.num, card.official)}
                 alt={card.headline}
             />
-            <img class="kt-face kt-back" src={tagBack(card.lang, card.tag.num)} alt="" />
+            {#if !flat}
+                <img class="kt-face kt-back" src={tagBack(card.lang, card.tag.num)} alt="" />
+            {/if}
         </div>
     </div>
 
@@ -153,6 +159,22 @@
     /* Reduced motion: no 3D transition; click still swaps faces instantly. */
     .kt.static .kt-flip {
         transition: none;
+    }
+
+    /* Flat export mode: a plain 2D front face. Dropping the 3D context and
+       backface-visibility is what makes html-to-image capture reliably. */
+    .kt.flat .kt-stage {
+        perspective: none;
+    }
+
+    .kt.flat .kt-flip {
+        transform: none;
+        transform-style: flat;
+        transition: none;
+    }
+
+    .kt.flat .kt-face {
+        backface-visibility: visible;
     }
 
     .kt-text {

@@ -57,12 +57,31 @@ describe('Builder', () => {
 
     test('download image renders the card to a PNG', async () => {
         const { toPng } = await import('html-to-image');
+        toPng.mockClear();
         // Stub the anchor click so jsdom doesn't attempt a (download) navigation.
         const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
         render(Builder);
         await fireEvent.click(screen.getByRole('button', { name: 'Download image' }));
-        expect(toPng).toHaveBeenCalled();
+        // The export path now awaits image decode/fonts before capturing.
+        await vi.waitFor(() => expect(toPng).toHaveBeenCalled());
+
+        // It must capture the flat export node (single face, no rotated back),
+        // not the interactive 3D preview — the fix for cross-engine PNG export.
+        // (The node is detached again once the capture resolves, so assert on
+        // its structure directly rather than document attachment.)
+        const captured = toPng.mock.calls[0][0];
+        expect(captured).toHaveClass('export-capture');
+        expect(captured.querySelector('.kt')).toHaveClass('flat');
+        expect(captured.querySelector('.kt-front')).not.toBeNull();
+        expect(captured.querySelector('.kt-back')).toBeNull();
         click.mockRestore();
+    });
+
+    test('the flat export node is only mounted during capture', () => {
+        const { container } = render(Builder);
+        // Normally absent, so it never duplicates the preview's text/headline.
+        expect(container.querySelector('.export-capture')).toBeNull();
+        expect(container.querySelectorAll('.kt-headline')).toHaveLength(1);
     });
 
     test('seeds the form from an initial payload (editing)', () => {

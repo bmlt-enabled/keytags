@@ -1,5 +1,5 @@
 <script>
-    import { untrack } from 'svelte';
+    import { untrack, flushSync } from 'svelte';
     import { toPng } from 'html-to-image';
     import KeytagCard from './KeytagCard.svelte';
     import { buildCard, milestoneOptions, keyForTag, milestoneForDate } from '../lib/card.js';
@@ -55,6 +55,8 @@
 
     let copied = $state(false);
     let previewEl = $state(null);
+    let exportEl = $state(null);
+    let exporting = $state(false);
 
     const options = $derived(milestoneOptions(special));
     const sel = $derived(options.find((o) => o.key === milestoneKey) ?? options[0]);
@@ -97,17 +99,37 @@
     }
 
     async function downloadPng() {
-        if (!previewEl) return;
-        const bg = getComputedStyle(document.body).backgroundColor || '#ffffff';
-        const dataUrl = await toPng(previewEl, {
-            pixelRatio: 2,
-            backgroundColor: bg,
-            cacheBust: true,
-        });
-        const a = document.createElement('a');
-        a.href = dataUrl;
-        a.download = `keytag-${sel.label.replace(/\s+/g, '-').toLowerCase()}.png`;
-        a.click();
+        // Capture a flat, single-face copy rather than the interactive 3D
+        // preview: the flip's preserve-3d / backface-visibility serialize
+        // unreliably across engines (mirrored text in Chromium, a missing tag
+        // in WebKit). Mount it synchronously just for the capture.
+        exporting = true;
+        flushSync();
+        try {
+            if (!exportEl) return;
+            // The freshly mounted node's faces must be decoded before capture,
+            // or the PNG comes out blank. They share URLs with the (already
+            // loaded) preview, so no cache-busting — that would refetch and race.
+            await Promise.all(
+                [...exportEl.querySelectorAll('img')].map((img) =>
+                    (img.complete && img.naturalWidth > 0) || typeof img.decode !== 'function'
+                        ? null
+                        : img.decode().catch(() => {}),
+                ),
+            );
+            if (document.fonts?.ready) await document.fonts.ready;
+            const bg = getComputedStyle(document.body).backgroundColor || '#ffffff';
+            const dataUrl = await toPng(exportEl, {
+                pixelRatio: 2,
+                backgroundColor: bg,
+            });
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = `keytag-${sel.label.replace(/\s+/g, '-').toLowerCase()}.png`;
+            a.click();
+        } finally {
+            exporting = false;
+        }
     }
 
     function startOver() {
@@ -225,6 +247,20 @@
         </div>
         <p class="hint">Tap the tag to flip it.</p>
     </section>
+
+    <!-- Flat copy captured by the PNG export (see downloadPng), mounted only
+         during capture so it never duplicates the preview. It renders a single
+         face with no 3D flip so the image is reliable in both Chromium and
+         WebKit. The wrapper hides it with a zero-size overflow box rather than
+         an off-screen offset (which html-to-image renders as a blank frame);
+         the captured node itself stays at its natural origin and size. -->
+    {#if exporting}
+        <div class="export-hidden" aria-hidden="true">
+            <div class="preview-stage export-capture" bind:this={exportEl}>
+                <KeytagCard {card} intro={false} interactive={false} flat width="260px" />
+            </div>
+        </div>
+    {/if}
 </div>
 
 <style>
@@ -416,6 +452,23 @@
     .preview {
         position: sticky;
         top: 1.5rem;
+    }
+
+    /* Hide the export copy without moving it off-screen: html-to-image renders
+       a large negative offset as a blank frame, so clip it with a zero-size box
+       instead while the captured node keeps its natural position and size. */
+    .export-hidden {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .export-capture {
+        width: 340px;
     }
 
     .preview-stage {

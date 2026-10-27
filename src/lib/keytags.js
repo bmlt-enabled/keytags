@@ -52,10 +52,16 @@ export function dateSpan(fromDate, now = new Date()) {
  * @returns {Date|null}
  */
 export function parseCleanDate(iso) {
-    if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return null;
+    if (typeof iso !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return null;
     const [y, m, d] = iso.split('-').map((n) => parseInt(n, 10));
     const date = new Date(y, m - 1, d);
-    return Number.isNaN(date.getTime()) ? null : date;
+    if (Number.isNaN(date.getTime())) return null;
+    // Reject impossible dates the Date constructor silently rolls over
+    // (e.g. 2025-02-31 → Mar 3; 2025-13-01 → Jan 1 2026).
+    if (date.getFullYear() !== y || date.getMonth() !== m - 1 || date.getDate() !== d) {
+        return null;
+    }
+    return date;
 }
 
 /**

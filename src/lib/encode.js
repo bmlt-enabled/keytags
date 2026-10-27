@@ -17,6 +17,103 @@
  *   v   view: "display" for full-screen meeting mode, else card
  */
 
+import { parseCleanDate } from './keytags.js';
+import { languages } from './lang/index.js';
+
+// Allowlists for validating untrusted payloads from shared links.
+const TAG_NUMS = new Set([
+    '01',
+    '02',
+    '03',
+    '04',
+    '05',
+    '06',
+    '07',
+    '08',
+    '09',
+    '10',
+    '11',
+    '12',
+    '13',
+    '14',
+    '15',
+    '16',
+]);
+const SUPPORTED_LANGS = new Set(Object.keys(languages));
+const VIEWS = new Set(['display', 'edit']);
+// Length caps match the builder's input `maxlength` attributes.
+const STR_MAX = { to: 40, fr: 40, msg: 180 };
+
+function isPlainObject(v) {
+    return typeof v === 'object' && v !== null && !Array.isArray(v);
+}
+
+/**
+ * Validate and normalize an untrusted decoded payload.
+ *
+ * Returns a clean payload object, or `null` when the data is structurally
+ * unusable so callers fall back to the builder (the project's standard
+ * corrupt-fragment behavior). Harmless unknowns are normalized rather than
+ * rejected: an unsupported language becomes English, and an unknown view flag
+ * is dropped to the default card view.
+ *
+ * @param {unknown} obj
+ * @returns {object|null}
+ */
+function sanitizePayload(obj) {
+    if (!isPlainObject(obj)) return null;
+
+    const out = {};
+
+    // Milestone tag number: a known two-digit tag.
+    if (obj.m !== undefined) {
+        if (typeof obj.m !== 'string' || !TAG_NUMS.has(obj.m)) return null;
+        out.m = obj.m;
+    }
+
+    // Whole-year count for yearly tags.
+    if (obj.y !== undefined) {
+        if (typeof obj.y !== 'number' || !Number.isInteger(obj.y) || obj.y < 1 || obj.y > 200) {
+            return null;
+        }
+        out.y = obj.y;
+    }
+
+    // Clean date: a real YYYY-MM-DD within sane year bounds.
+    if (obj.d !== undefined) {
+        const date = parseCleanDate(obj.d);
+        if (!date) return null;
+        const year = date.getFullYear();
+        if (year < 1900 || year > 2200) return null;
+        out.d = obj.d;
+    }
+
+    // Free-text fields: strings within the builder's length limits.
+    for (const key of ['to', 'fr', 'msg']) {
+        if (obj[key] !== undefined) {
+            if (typeof obj[key] !== 'string' || obj[key].length > STR_MAX[key]) return null;
+            out[key] = obj[key];
+        }
+    }
+
+    // Language: normalize anything unsupported to English.
+    if (obj.l !== undefined) {
+        out.l = typeof obj.l === 'string' && SUPPORTED_LANGS.has(obj.l) ? obj.l : 'en';
+    }
+
+    // Flags: accept the encoder's `1`/`true`; anything else is off.
+    if (obj.o === 1 || obj.o === true) out.o = 1;
+    if (obj.s === 1 || obj.s === true) out.s = 1;
+
+    // View: keep only known views; ignore anything else (defaults to card view).
+    if (typeof obj.v === 'string' && VIEWS.has(obj.v)) out.v = obj.v;
+
+    // Nothing to render a tag from.
+    if (out.m === undefined && out.d === undefined) return null;
+
+    return out;
+}
+
 function toBase64Url(str) {
     const bytes = new TextEncoder().encode(str);
     let binary = '';
@@ -42,8 +139,7 @@ export function decodePayload(fragment) {
     const raw = fragment.startsWith('#') ? fragment.slice(1) : fragment;
     if (!raw) return null;
     try {
-        const obj = JSON.parse(fromBase64Url(raw));
-        return obj && typeof obj === 'object' ? obj : null;
+        return sanitizePayload(JSON.parse(fromBase64Url(raw)));
     } catch {
         return null;
     }

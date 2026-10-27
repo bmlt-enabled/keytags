@@ -18,6 +18,22 @@ describe('parseCleanDate', () => {
             expect(parseCleanDate(bad)).toBeNull();
         },
     );
+
+    test.each([123, ['2024-03-15'], {}, true])('rejects non-string input %s', (bad) => {
+        expect(parseCleanDate(bad)).toBeNull();
+    });
+
+    test.each(['2025-02-31', '2025-13-01', '2025-00-10', '2025-04-31'])(
+        'rejects the impossible date %s instead of rolling it over',
+        (bad) => {
+            expect(parseCleanDate(bad)).toBeNull();
+        },
+    );
+
+    test('accepts a valid leap day', () => {
+        expect(parseCleanDate('2024-02-29')).not.toBeNull();
+        expect(parseCleanDate('2023-02-29')).toBeNull();
+    });
 });
 
 describe('dateSpan', () => {
