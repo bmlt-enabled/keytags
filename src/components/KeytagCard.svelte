@@ -78,17 +78,21 @@
     >
         <div class="kt-flip">
             <div class="kt-face kt-front">
-                <img
-                    class="kt-tag"
-                    src={tagFront(card.lang, card.tag.num, card.official)}
-                    alt={card.headline}
-                />
-                <img class="kt-ring" src={ringTopSrc} alt="" aria-hidden="true" />
+                <div class="kt-art">
+                    <img
+                        class="kt-tag"
+                        src={tagFront(card.lang, card.tag.num, card.official)}
+                        alt={card.headline}
+                    />
+                    <img class="kt-ring" src={ringTopSrc} alt="" aria-hidden="true" />
+                </div>
             </div>
             {#if !flat}
                 <div class="kt-face kt-back">
-                    <img class="kt-tag" src={tagBack(card.lang, card.tag.num)} alt="" />
-                    <img class="kt-ring" src={ringTopSrc} alt="" aria-hidden="true" />
+                    <div class="kt-art">
+                        <img class="kt-tag" src={tagBack(card.lang, card.tag.num)} alt="" />
+                        <img class="kt-ring" src={ringTopSrc} alt="" aria-hidden="true" />
+                    </div>
                 </div>
             {/if}
         </div>
@@ -137,10 +141,24 @@
         cursor: pointer;
     }
 
+    /* Groups the tag image and its ring-top overlay into a single rasterized
+       surface (via `filter`) so the two always composite together. Without this
+       grouping, WebKit and Gecko round each image to its own device-pixel row
+       inside the flip's 3D transform, so the overlay arc lands ~1px off the
+       tag's printed ring and shows a seam at the top. (Chromium happens to align
+       them; the bug is cross-engine.) Carrying the drop-shadow here instead of
+       on the tag is what creates that shared surface. */
+    .kt-art {
+        position: relative;
+        width: 100%;
+        display: block;
+        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.28));
+    }
+
     /* The tag face draws a split ring with a small gap at the very top; this
        overlay is the matching top arc that bridges that gap into a closed ring.
        It is cut from the same 320px-wide artwork as the face, so it must render
-       at the same width (100%) and sit at the face's top-centre to line up
+       at the same width (100%) and sit at the art's top-centre to line up
        exactly — mirroring NACC's `background-size:100%; background-position:
        center top`. One lives in each face so the closed ring rotates with the
        tag during the flip. */
@@ -177,7 +195,6 @@
     .kt-tag {
         width: 100%;
         display: block;
-        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.28));
     }
 
     .kt-back {
