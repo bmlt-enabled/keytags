@@ -12,9 +12,21 @@
 
     const LANGS = [
         { code: 'en', label: 'English' },
+        { code: 'da', label: 'Dansk' },
+        { code: 'de', label: 'Deutsch' },
+        { code: 'el', label: 'Ελληνικά' },
         { code: 'es', label: 'Español' },
-        { code: 'pt', label: 'Português' },
+        { code: 'fa', label: 'فارسی' },
+        { code: 'fi', label: 'Suomi' },
+        { code: 'fr', label: 'Français' },
+        { code: 'hi', label: 'हिन्दी' },
         { code: 'it', label: 'Italiano' },
+        { code: 'ja', label: '日本語' },
+        { code: 'ne', label: 'नेपाली' },
+        { code: 'pl', label: 'Polski' },
+        { code: 'pt', label: 'Português' },
+        { code: 'ru', label: 'Русский' },
+        { code: 'sv', label: 'Svenska' },
         { code: 'zh-Hans', label: '简体中文' },
         { code: 'zh-Hant', label: '繁體中文' },
     ];

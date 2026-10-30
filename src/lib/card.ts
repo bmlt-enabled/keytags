@@ -16,7 +16,6 @@ export function tagFront(lang: string, num: string, official: boolean): string {
 export function tagBack(lang: string, num: string): string {
     return `${BASE}images/${lang}/${num}.png`;
 }
-export const ringTopSrc = `${BASE}images/00_RingTop.png`;
 
 /** The specialty-aware tag number for a whole-year milestone (mirrors createTagsArray). */
 export function yearlyTag(years: number, showSpecial: boolean): string {

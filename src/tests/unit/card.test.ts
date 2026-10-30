@@ -7,7 +7,6 @@ import {
     buildCard,
     tagFront,
     tagBack,
-    ringTopSrc,
 } from '../../lib/card';
 
 describe('yearlyTag', () => {
@@ -139,6 +138,5 @@ describe('image path helpers', () => {
         expect(tagFront('en', '07', false)).toMatch(/images\/en\/07\.png$/);
         expect(tagFront('en', '07', true)).toMatch(/images\/en\/07_Front\.png$/);
         expect(tagBack('es', '09')).toMatch(/images\/es\/09\.png$/);
-        expect(ringTopSrc).toMatch(/images\/00_RingTop\.png$/);
     });
 });

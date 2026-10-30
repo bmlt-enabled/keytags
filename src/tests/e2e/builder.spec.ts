@@ -5,7 +5,7 @@ test.describe('Builder', () => {
         await page.goto('/');
         await expect(page.getByRole('heading', { name: 'Send a Virtual Keytag' })).toBeVisible();
         await expect(page.locator('.kt-headline')).toHaveText('24 Hours');
-        await expect(page.locator('.kt-front img.kt-ring')).toBeVisible();
+        await expect(page.locator('.kt-front img.kt-tag')).toBeVisible();
     });
 
     test('live preview updates with milestone and recipient', async ({ page }) => {

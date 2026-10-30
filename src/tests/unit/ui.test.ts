@@ -35,7 +35,8 @@ describe('detectLang', () => {
         [['es-MX', 'en'], 'es'],
         [['pt-BR'], 'pt'],
         [['it'], 'it'],
-        [['fr', 'de'], 'en'], // unsupported → English
+        [['fr', 'de'], 'fr'], // now supported
+        [['ko', 'tr'], 'en'], // unsupported → English
         [[], 'en'],
     ])('%j → %s', (preferred, expected) => {
         expect(detectLang(preferred)).toBe(expected);
