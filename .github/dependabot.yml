@@ -10,6 +10,11 @@ updates:
       schedule:
           interval: weekly
       open-pull-requests-limit: 5
+      # Never update TypeScript to the 7.x line (keep us on the current major).
+      ignore:
+          - dependency-name: 'typescript'
+            versions:
+                - '7.x'
       groups:
           minor-and-patch:
               update-types:
